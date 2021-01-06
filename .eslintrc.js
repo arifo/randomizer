@@ -73,6 +73,20 @@ module.exports = {
     'import/first': 'error',
     'import/newline-after-import': 'error',
     'import/no-unresolved': ['error', { caseSensitive: false }],
+
+    "prettier/prettier": [
+      "error",
+      {
+        "bracketSpacing": true,
+        "jsxBracketSameLine": true,
+        "singleQuote": true,
+        "trailingComma": 'all',
+        "printWidth": 100,
+        "tabWidth": 2,
+        "semi": true,
+        "arrowParens": 'avoid',
+      }
+    ]
   },
   settings: {
     'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
