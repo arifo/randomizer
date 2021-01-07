@@ -9,9 +9,13 @@ import {
   ImageStyle,
 } from 'react-native';
 
+import { theme } from 'theme';
+
 import { sv } from 'utils/scaler';
 
-type Icons = 'close' | 'chevron-left' | 'settings';
+const hitSlop = { top: 15, left: 15, right: 15, bottom: 15 };
+
+type Icons = 'chevron-left' | 'close' | 'plus-circle' | 'settings';
 
 interface IconButtonProps extends TouchableOpacityProps {
   iconStyle?: ImageStyle;
@@ -20,11 +24,6 @@ interface IconButtonProps extends TouchableOpacityProps {
 
 const getIcon = (variant: Icons) => {
   switch (variant) {
-    case 'settings':
-      return {
-        src: require('assets/images/settings.png'),
-        style: { width: sv(28), height: sv(28) },
-      };
     case 'chevron-left':
       return {
         src: require('assets/images/chevron_left.png'),
@@ -35,6 +34,16 @@ const getIcon = (variant: Icons) => {
         src: require('assets/images/close.png'),
         style: { width: sv(30), height: sv(30) },
       };
+    case 'plus-circle':
+      return {
+        src: require('assets/images/circle-plus.png'),
+        style: { width: sv(30), height: sv(30) },
+      };
+    case 'settings':
+      return {
+        src: require('assets/images/settings.png'),
+        style: { width: sv(28), height: sv(28) },
+      };
     default:
       return { src: undefined, style: undefined };
   }
@@ -42,7 +51,8 @@ const getIcon = (variant: Icons) => {
 
 export const IconButton = ({ iconStyle, icon, ...props }: IconButtonProps) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const tintColor = isDarkMode ? 'white' : 'black';
+  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const tintColor = themeColors.iconButton;
 
   const { src, style } = getIcon(icon);
 
@@ -51,7 +61,7 @@ export const IconButton = ({ iconStyle, icon, ...props }: IconButtonProps) => {
   }
 
   return (
-    <TouchableOpacity {...props}>
+    <TouchableOpacity hitSlop={hitSlop} {...props}>
       <Image source={src} style={[styles.icon, style, { tintColor: tintColor, ...iconStyle }]} />
     </TouchableOpacity>
   );

@@ -7,3 +7,6 @@ export function pluralize(count: number, str: string, countText?: string) {
   }
   return `${countText || count} ${str}`;
 }
+
+export const uniqueId = () =>
+  Math.random().toString(36).substring(2) + new Date().getTime().toString(36);

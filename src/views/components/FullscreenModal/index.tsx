@@ -11,6 +11,7 @@ import { Text } from '../Text';
 
 interface FullscreenModalProps {
   visible?: boolean;
+  scrollEnabled?: boolean;
   onClose?: () => void;
   loading?: boolean;
   title?: string;
@@ -23,7 +24,7 @@ const ModalHeader = ({ onClose, title }: { onClose?: () => void; title?: string 
   <View style={styles.modalHeader}>
     <View style={styles.mHeaderSides} />
     <View style={styles.mHeaderCenter}>
-      <Text size={18} style={{ fontWeight: 'bold' }}>
+      <Text size={18} style={styles.title}>
         {title}
       </Text>
     </View>
@@ -41,6 +42,7 @@ export const FullscreenModal = ({
   children,
   accessibilityLabel,
   OverlayComponent,
+  scrollEnabled = true,
 }: FullscreenModalProps) => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -52,7 +54,8 @@ export const FullscreenModal = ({
       onRequestClose={onClose}
       transparent>
       <Container
-        color={isDarkMode ? 'rgba(0,0,0,0.9)' : 'rgba(233, 236, 239,0.97)'}
+        scrollEnabled={scrollEnabled}
+        color={isDarkMode ? 'rgba(0,0,0,0.9)' : 'rgba(241, 250, 238,0.98)'}
         loading={loading}
         Header={<ModalHeader {...{ title, onClose }} />}
         accessibilityLabel={accessibilityLabel}>
@@ -75,4 +78,6 @@ const styles = StyleSheet.create({
   mHeaderSides: { flex: 0.3 },
   mHeaderRight: { flex: 0.3, alignItems: 'flex-end' },
   mHeaderCenter: { flex: 1, alignItems: 'center' },
+
+  title: { fontWeight: 'bold' },
 });

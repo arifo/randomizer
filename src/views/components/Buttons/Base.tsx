@@ -35,7 +35,7 @@ const LOLLIPOP = 21;
 
 export const ButtonBase: React.FC<ButtonBaseProps> = ({
   style,
-  pressColor = '#836f17',
+  pressColor = '#83c5be',
   borderless = true,
   children,
   innerStyle,

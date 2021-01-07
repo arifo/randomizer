@@ -32,6 +32,7 @@ interface ContainerProps extends ViewProps {
   Header?: JSX.Element;
   Footer?: JSX.Element;
   loading?: boolean;
+  scrollEnabled?: boolean;
   color?: string;
   loadingMessage?: string;
   keyboardShouldPersistTaps?: boolean | 'never' | 'handled' | 'always' | undefined;
@@ -44,6 +45,7 @@ export const Container: React.FC<ContainerProps> = ({
   style,
   color,
   padding,
+  scrollEnabled,
   ...props
 }) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -60,6 +62,7 @@ export const Container: React.FC<ContainerProps> = ({
       <KeyboarAwareContainer>
         <ScrollView
           keyboardShouldPersistTaps="handled"
+          scrollEnabled={scrollEnabled}
           {...props}
           contentContainerStyle={containerStyles}>
           {children}

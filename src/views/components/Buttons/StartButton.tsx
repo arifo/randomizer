@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, useColorScheme } from 'react-native';
+
+import { theme } from 'theme';
 
 import { Text } from '../Text';
 
@@ -15,13 +17,15 @@ interface StartButtonProps {
 }
 
 export const StartButton = ({ disabled, text, onPress }: StartButtonProps) => {
+  const isDarkMode = useColorScheme() === 'dark';
+  const themeColors = isDarkMode ? theme.dark : theme.light;
   return (
     <ButtonBase
       disabled={disabled}
       onPress={onPress}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: themeColors.startButton }]}
       innerStyle={styles.inner}>
-      <Text numberOfLines={1} size={36}>
+      <Text numberOfLines={1} size={36} color="white">
         {text || 'Start'}
       </Text>
     </ButtonBase>

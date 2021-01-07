@@ -1,13 +1,17 @@
 const dark = {
   backgroundColor: 'black',
-  text: 'white',
-  menuButton: '#00bbf9',
+  text: '#f1faee',
+  menuButton: '#1d3557',
+  startButton: '#1d3557',
+  iconButton: '#dee2e6',
 };
 
 const light = {
-  backgroundColor: '#e9ecef',
-  text: 'black',
-  menuButton: '#6c757d',
+  backgroundColor: '#f1faee',
+  text: '#343a40',
+  menuButton: '#023e7d',
+  startButton: '#1d3557',
+  iconButton: '#1d3557',
 };
 
 export const theme = {

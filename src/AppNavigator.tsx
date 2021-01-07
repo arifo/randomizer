@@ -5,7 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from 'views/screens/Home';
 import LetterScreen from 'views/screens/Letter';
-import ListScreen from 'views/screens/List';
+import ListRandomizer from 'views/screens/ListRandomizer';
+import ListsScreen from 'views/screens/Lists';
 import NumberScreen from 'views/screens/Number';
 import PasswordScreen from 'views/screens/Password';
 import SettingsScreen from 'views/screens/Settings';
@@ -26,7 +27,12 @@ const RootStackScreens = () => (
       component={LetterScreen}
       options={{ headerShown: false }}
     />
-    <RootStack.Screen name="ListScreen" component={ListScreen} options={{ headerShown: false }} />
+    <RootStack.Screen
+      name="ListRandomizer"
+      component={ListRandomizer}
+      options={{ headerShown: false }}
+    />
+    <RootStack.Screen name="ListsScreen" component={ListsScreen} options={{ headerShown: false }} />
     <RootStack.Screen
       name="PasswordScreen"
       component={PasswordScreen}

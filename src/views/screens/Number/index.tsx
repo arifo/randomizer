@@ -20,7 +20,6 @@ import { getRandomNum } from 'randomizer';
 import { RootState } from 'types';
 import { isAndroid } from 'utils/platforms';
 import { s } from 'utils/scaler';
-import { pluralize } from 'utils/strings';
 
 import { NumberSettings } from './Settings';
 
@@ -32,7 +31,7 @@ if (isAndroid) {
 
 const { width } = Dimensions.get('window');
 
-const numPadH = width * 0.6;
+const numPadH = width * 0.7;
 
 const NumberScreen = () => {
   const scrollRef = useRef<ScrollView>(null);
@@ -142,7 +141,7 @@ const NumberScreen = () => {
         Vibration.vibrate(50);
         setWaiting(false);
       }, delay * 1000);
-    }, [waiting, count, randomNums, delay]),
+    }, [waiting, count, minNum, maxNum, randomNums, delay]),
     100,
   );
 
@@ -164,7 +163,7 @@ const NumberScreen = () => {
         setRandomNum(prevState => [...prevState, nextNumber]);
         Vibration.vibrate(50);
       }, delay * 1000);
-    }, [waiting, count, randomNums, delay]),
+    }, [waiting, count, minNum, maxNum, randomNums, delay]),
     100,
   );
 
@@ -201,7 +200,7 @@ const NumberScreen = () => {
   const buttonText =
     randomNums.length > 0 ? (count <= randomNums.length ? 'Reset' : 'Next') : 'Start';
 
-  const Loader = autoGenerate ? Wander : Fold;
+  // const Loader = autoGenerate ? Wander : Fold;
 
   return (
     <>
@@ -214,19 +213,24 @@ const NumberScreen = () => {
             right={<IconButton icon="settings" onPress={openSettings} />}
           />
         }
-        Footer={
-          <View style={styles.footer}>
-            {pressToStart && (
-              <StartButton disabled={waiting} text={buttonText} onPress={handleStart} />
-            )}
-            {randomNums.length > 0 && <Text style={styles.autoMt}>{getHintText(buttonText)}</Text>}
-          </View>
-        }>
+        // Footer={
+        //   <View style={styles.footer}>
+        //     {pressToStart && (
+        //       <StartButton disabled={waiting} text={buttonText} onPress={handleStart} />
+        //     )}
+        //     {randomNums.length > 0 && <Text style={styles.autoMt}>{getHintText(buttonText)}</Text>}
+        //   </View>
+        // }
+      >
         <Pad
           loading={waiting}
-          Loader={<Loader size={autoGenerate ? numPadH : numPadH * 0.6} color={'blue'} />}>
+          height={numPadH}
+          Loader={
+            // <Loader size={autoGenerate ? numPadH : numPadH * 0.58} color={'blue'} />
+            <Wander size={numPadH} color={'blue'} />
+          }>
           {randomNums.length > 0 && (
-            <Text adjustsFontSizeToFit numberOfLines={1} size={100}>
+            <Text adjustsFontSizeToFit numberOfLines={1} size={150}>
               {randomNums[randomNums.length - 1]}
             </Text>
           )}
@@ -254,6 +258,12 @@ const NumberScreen = () => {
             ))}
           </ScrollView>
         </View>
+        <View style={styles.footer}>
+          {pressToStart && (
+            <StartButton disabled={waiting} text={buttonText} onPress={handleStart} />
+          )}
+        </View>
+        {randomNums.length > 0 && <Text style={styles.autoMt}>{getHintText(buttonText)}</Text>}
       </Container>
 
       <NumberSettings visible={settingsVisible} onClose={closeSettings} />
@@ -270,6 +280,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     marginTop: s(30),
+    marginBottom: s(20),
+    height: s(80),
   },
 
   ranNumView: {
@@ -284,9 +296,9 @@ const styles = StyleSheet.create({
   footer: {
     width: '100%',
     alignItems: 'center',
-    paddingBottom: 25,
-    flex: 0.7,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    paddingBottom: 20,
+    flex: 1,
   },
-  autoMt: { marginTop: 'auto' },
+  autoMt: { bottom: s(20), position: 'absolute', textAlign: 'center', alignSelf: 'center' },
 });
