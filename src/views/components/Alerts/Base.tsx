@@ -4,7 +4,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   useColorScheme,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -13,12 +12,13 @@ import { s } from 'utils/scaler';
 
 import { Text } from '../Text';
 
-interface PromptProps {
+export interface PopupProps {
   visible: boolean;
-  value: string;
-  onChangeText: (t: string) => void;
-  yesPress: () => void;
-  noPress: () => void;
+  yesPress?: () => void;
+  noPress?: () => void;
+  title?: string;
+  noText?: string;
+  yesText?: string;
 }
 
 const ActionButton = ({ text, onPress }: { text: string; onPress: () => void }) => {
@@ -29,33 +29,36 @@ const ActionButton = ({ text, onPress }: { text: string; onPress: () => void }) 
   );
 };
 
-export const Prompt = ({ visible, value, onChangeText, yesPress, noPress }: PromptProps) => {
+export const BasePopup: React.FC<PopupProps> = ({
+  children,
+  visible,
+  yesPress,
+  noPress,
+  noText,
+  yesText,
+  title,
+}) => {
   const isDarkMode = useColorScheme() === 'dark';
   if (!visible) {
     return null;
   }
 
   const backgroundColor = isDarkMode ? '#6c757d' : '#e9ecef';
-  const inputColor = isDarkMode ? '#ced4da' : '#f5f5f5';
   const borderColor = isDarkMode ? '#ced4da' : '#f5f5f5';
 
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView behavior="padding" style={styles.safe}>
         <View style={[styles.popup, { backgroundColor }]}>
-          <Text style={styles.title}>List title</Text>
-          <TextInput
-            autoFocus
-            value={value}
-            onChangeText={onChangeText}
-            style={[styles.input, { backgroundColor: inputColor }]}
-            onSubmitEditing={() => yesPress()}
-            returnKeyType="done"
-          />
+          {!!title && (
+            <Text style={[styles.title, !children && { marginBottom: s(15) }]}>{title}</Text>
+          )}
+          {children}
+
           <View style={[styles.footer, { borderTopColor: borderColor }]}>
-            <ActionButton text="Cancel" onPress={noPress} />
+            <ActionButton text={noText || 'Cancel'} onPress={noPress} />
             <View style={[styles.separator, { backgroundColor: borderColor }]} />
-            <ActionButton text="Save" onPress={yesPress} />
+            <ActionButton text={yesText || 'Ok'} onPress={yesPress} />
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -74,21 +77,18 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     marginTop: s(20),
-    marginBottom: s(15),
+    marginBottom: s(5),
     fontWeight: 'bold',
     fontSize: 20,
   },
-  input: {
-    width: '90%',
-    padding: 0,
-    alignSelf: 'center',
-    height: s(40),
-    borderRadius: s(8),
-    paddingHorizontal: 10,
-    marginBottom: s(10),
-    fontSize: s(15),
+
+  footer: {
+    flexDirection: 'row',
+    width: '100%',
+    height: s(50),
+
+    borderTopWidth: 1,
   },
-  footer: { flexDirection: 'row', width: '100%', height: s(50), borderTopWidth: 1 },
   actionButton: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   separator: { height: '100%', width: 1 },
 });

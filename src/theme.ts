@@ -4,6 +4,7 @@ const dark = {
   menuButton: '#1d3557',
   startButton: '#1d3557',
   iconButton: '#dee2e6',
+  loader: '#84a59d',
 };
 
 const light = {
@@ -12,6 +13,7 @@ const light = {
   menuButton: '#023e7d',
   startButton: '#1d3557',
   iconButton: '#1d3557',
+  loader: '#0077b6',
 };
 
 export const theme = {

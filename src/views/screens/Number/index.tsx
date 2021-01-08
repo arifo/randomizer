@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useFocusEffect } from '@react-navigation/native';
-import { View, StyleSheet, Dimensions, UIManager, ScrollView, Vibration } from 'react-native';
-import { Fold, Wander } from 'react-native-animated-spinkit';
+import { View, StyleSheet, Dimensions, UIManager, Vibration } from 'react-native';
 import RNShake from 'react-native-shake';
-import Toast from 'react-native-toast-message';
+// import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 
 import { IconButton, StartButton } from '@components/Buttons';
 import { Container } from '@components/Container';
 import Header from '@components/Header';
 import { Pad } from '@components/Pad';
+import { RolledItems } from '@components/RolledItems';
 import { Text } from '@components/Text';
 import { useAction } from 'hooks/useAction';
 import { useDebounceCallback } from 'hooks/useDebounce';
@@ -34,8 +34,6 @@ const { width } = Dimensions.get('window');
 const numPadH = width * 0.7;
 
 const NumberScreen = () => {
-  const scrollRef = useRef<ScrollView>(null);
-
   const timeoutRef = useRef<NodeJS.Timeout>();
   const timerRef = useRef<NodeJS.Timeout>();
 
@@ -76,8 +74,6 @@ const NumberScreen = () => {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line no-unused-expressions
-    scrollRef.current?.scrollToEnd();
     if (hasEnded) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -85,16 +81,16 @@ const NumberScreen = () => {
       setWaiting(false);
       return;
     }
-  }, [randomNums]);
+  }, [hasEnded]);
 
   const onEndReached = () => {
     Vibration.vibrate(100);
-    Toast.show({
-      text1: 'Saved to history',
-      type: 'success',
-      visibilityTime: 1000,
-      topOffset: 50,
-    });
+    // Toast.show({
+    //   text1: 'Saved to history',
+    //   type: 'success',
+    //   visibilityTime: 1000,
+    //   topOffset: 50,
+    // });
     saveToHistory({
       randomNumbers: randomNums,
       min: minNum,
@@ -127,7 +123,7 @@ const NumberScreen = () => {
         return;
       }
 
-      Toast.hide();
+      // Toast.hide();
 
       if (hasEnded) {
         onEndReached();
@@ -151,7 +147,8 @@ const NumberScreen = () => {
         return;
       }
 
-      Toast.hide();
+      // Toast.hide();
+
       if (hasEnded) {
         onEndReached();
         return;
@@ -200,8 +197,6 @@ const NumberScreen = () => {
   const buttonText =
     randomNums.length > 0 ? (count <= randomNums.length ? 'Reset' : 'Next') : 'Start';
 
-  // const Loader = autoGenerate ? Wander : Fold;
-
   return (
     <>
       <Container
@@ -212,52 +207,22 @@ const NumberScreen = () => {
             title="Number Generator"
             right={<IconButton icon="settings" onPress={openSettings} />}
           />
-        }
-        // Footer={
-        //   <View style={styles.footer}>
-        //     {pressToStart && (
-        //       <StartButton disabled={waiting} text={buttonText} onPress={handleStart} />
-        //     )}
-        //     {randomNums.length > 0 && <Text style={styles.autoMt}>{getHintText(buttonText)}</Text>}
-        //   </View>
-        // }
-      >
+        }>
         <Pad
           loading={waiting}
           height={numPadH}
-          Loader={
-            // <Loader size={autoGenerate ? numPadH : numPadH * 0.58} color={'blue'} />
-            <Wander size={numPadH} color={'blue'} />
-          }>
-          {randomNums.length > 0 && (
-            <Text adjustsFontSizeToFit numberOfLines={1} size={150}>
-              {randomNums[randomNums.length - 1]}
-            </Text>
-          )}
-          {!randomNums.length && !waiting && (
-            <Text adjustsFontSizeToFit numberOfLines={1} size={18}>
-              {getHintText()}
-            </Text>
-          )}
-          <Text style={{ position: 'absolute', bottom: 5 }}>
-            {`Min: ${minNum}    Max: ${maxNum}`}
-          </Text>
-        </Pad>
+          placeholder={getHintText()}
+          content={randomNums[randomNums.length - 1]}
+          progress={`Min: ${minNum}          ${randomNums.length}/${
+            uniqueOnly ? Math.min(count, maxNum - minNum + 1) : count
+          }          Max: ${maxNum}`}
+        />
 
-        <View style={styles.status}>
-          <Text>
-            {randomNums.length}/{uniqueOnly ? Math.min(count, maxNum - minNum + 1) : count}
-          </Text>
-          <ScrollView ref={scrollRef} horizontal style={{ marginTop: s(15) }}>
-            {randomNums.map((num, index) => (
-              <View key={index} style={[styles.ranNumView, { marginLeft: !index ? 0 : 5 }]}>
-                <Text size={14} color="white">
-                  {num}
-                </Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
+        <RolledItems
+          data={randomNums}
+          showAllDone={uniqueOnly ? randomNums.length === count : false}
+        />
+
         <View style={styles.footer}>
           {pressToStart && (
             <StartButton disabled={waiting} text={buttonText} onPress={handleStart} />
@@ -275,23 +240,6 @@ export default NumberScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: s(20) },
-
-  status: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginTop: s(30),
-    marginBottom: s(20),
-    height: s(80),
-  },
-
-  ranNumView: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: s(10),
-    paddingVertical: s(5),
-    borderRadius: 5,
-    backgroundColor: '#335c67',
-    marginBottom: 10,
-  },
 
   footer: {
     width: '100%',

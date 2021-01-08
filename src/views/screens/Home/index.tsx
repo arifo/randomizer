@@ -22,22 +22,18 @@ const HomeScreen = () => {
         <Header
           withSafeArea={false}
           withBack={false}
-          title="Randomizer"
-          right={<IconButton icon="settings" onPress={() => navToRoute('SettingsScreen')} />}
+          title="Randomize"
+          // right={<IconButton icon="settings" onPress={() => navToRoute('SettingsScreen')} />}
         />
       }>
       <View style={styles.flexRow}>
-        <MenuButton title="Number" route="NumberScreen" onPress={navToRoute} />
-        <MenuButton title="Letter" route="LetterScreen" onPress={navToRoute} />
+        <MenuButton title="Numbers" route="NumberScreen" onPress={navToRoute} />
+        <MenuButton title="Letters" route="LetterScreen" onPress={navToRoute} />
       </View>
 
       <View style={styles.flexRow}>
         <MenuButton title="List" route="ListsScreen" onPress={navToRoute} />
-        <MenuButton title="Yes or No" route="YesOrNoScreen" onPress={navToRoute} />
-      </View>
-      <View style={styles.flexRow}>
-        {/* <MenuButton title="Password" route="PasswordScreen" onPress={navToRoute} /> */}
-        {/* <MenuButton title="Word" route="WordScreen" onPress={navToRoute} /> */}
+        <MenuButton title="Dices" route="DicesScreen" onPress={navToRoute} />
       </View>
     </Container>
   );

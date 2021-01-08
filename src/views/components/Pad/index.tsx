@@ -1,7 +1,12 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
 import { View, StyleSheet, useColorScheme, Dimensions, ViewStyle } from 'react-native';
-import { Chase } from 'react-native-animated-spinkit';
+import { Chase, Wander } from 'react-native-animated-spinkit';
+
+import { theme } from 'theme';
+
+import { Text } from '../Text';
 
 const { width: wWidth } = Dimensions.get('window');
 
@@ -13,9 +18,11 @@ interface PadProps {
   width?: number;
   height?: number;
   value?: number | string;
-  hint?: string;
   loading?: boolean;
   Loader?: React.ReactNode;
+  content?: string | number;
+  progress?: string;
+  placeholder?: string;
 }
 
 export const Pad: React.FC<PadProps> = ({
@@ -25,16 +32,51 @@ export const Pad: React.FC<PadProps> = ({
   loading,
   Loader,
   style,
+  content,
+  progress,
+  placeholder,
 }) => {
   const isDarkMode = useColorScheme() === 'dark';
+  const themeColors = isDarkMode ? theme.dark : theme.light;
 
   const padColor = isDarkMode ? '#212529' : '#dee2e6';
 
   return (
     <View style={[styles.container, { backgroundColor: padColor, width, height }, style]}>
+      {loading && !content && (
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          size={150}
+          style={{ opacity: loading ? 0.5 : 1 }}>
+          ?
+        </Text>
+      )}
+
+      {!loading && !content && !!placeholder && (
+        <Text adjustsFontSizeToFit numberOfLines={1} size={18}>
+          {placeholder}
+        </Text>
+      )}
+
+      {!!content && (
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          size={150}
+          style={{ opacity: loading ? 0.5 : 1 }}>
+          {content}
+        </Text>
+      )}
+
+      {!!progress && <Text style={styles.progress}>{progress}</Text>}
+
       {children}
+
       {loading && (
-        <View style={styles.loader}>{Loader || <Chase size={height * 0.7} color={'blue'} />}</View>
+        <View style={styles.loader}>
+          {Loader || <Wander size={height} color={themeColors.loader} />}
+        </View>
       )}
     </View>
   );
@@ -48,6 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     borderRadius: 15,
+    paddingHorizontal: 10,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
@@ -59,4 +102,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  progress: { position: 'absolute', bottom: 5 },
 });

@@ -1,51 +1,55 @@
-import React, { useRef, useState } from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, { useEffect, useRef, useState } from 'react';
 
-import {
-  View,
-  StyleSheet,
-  useColorScheme,
-  FlatList,
-  Modal,
-  Pressable,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
+import { View, StyleSheet, useColorScheme, FlatList, Modal, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useSelector } from 'react-redux';
-
-import { ButtonBase, IconButton } from '@components/Buttons';
-import Header from '@components/Header';
-import { List, InputField } from '@components/List';
-import { Text } from '@components/Text';
-
-import { useAction } from 'hooks/useAction';
-import { listAddAction } from 'modules/lists/actions';
-import { RootState } from 'types';
+import { ListType } from 'modules/lists/types';
 import { isAndroid } from 'utils/platforms';
 import { s } from 'utils/scaler';
 import { uniqueId } from 'utils/strings';
-import { Prompt } from 'views/components/Prompt';
 
-interface NewListProps {
+import { Prompt } from '../Alerts';
+import { IconButton } from '../Buttons';
+import Header from '../Header';
+import { Text } from '../Text';
+
+import { InputField } from './InputField';
+import { List } from './List';
+
+interface ListEditorProps {
   visible: boolean;
   onClose: () => void;
+  list?: ListType;
+  defaultListName?: string;
+  onSave: (list: ListType) => void;
 }
 
-export const NewList = ({ visible, onClose }: NewListProps) => {
+export const ListEditor = ({
+  list,
+  defaultListName = 'List',
+  onSave,
+  visible,
+  onClose,
+}: ListEditorProps) => {
   const listRef = useRef<FlatList<string> | null>();
   const isDarkMode = useColorScheme() === 'dark';
-  const backgroundColor = isDarkMode ? 'rgba(0,0,0,0.9)' : 'rgba(241, 250, 238,0.98)';
 
-  const save = useAction(listAddAction);
-
-  const [items, setItems] = useState<string[]>([]);
+  const [listTitle, setListTitle] = useState(list?.title || defaultListName || '');
+  const [items, setItems] = useState<string[]>(list?.items || []);
   const [itemName, setItemName] = useState('');
 
-  const { lists } = useSelector((state: RootState) => state.lists);
-
   const [promptVisible, setPromptVisible] = useState(false);
-  const [listTitle, setListTitle] = useState(`List ${lists.length + 1}`);
+
+  useEffect(() => {
+    if (list) {
+      setListTitle(list.title);
+      setItems(list.items);
+    }
+    if (defaultListName) {
+      setListTitle(defaultListName);
+    }
+  }, [list, defaultListName]);
 
   const handleAddItem = () => {
     if (!itemName) {
@@ -60,21 +64,19 @@ export const NewList = ({ visible, onClose }: NewListProps) => {
   };
 
   const handleItemChange = (t: string, index: number) => {
-    setItems(prevs => {
-      prevs[index] = t;
-      return [...prevs];
-    });
+    const nItems = items.slice();
+    nItems[index] = t;
+    setItems(nItems);
   };
 
   const handleItemRemove = (index: number) => {
-    setItems(prevs => {
-      prevs.splice(index, 1);
-      return [...prevs];
-    });
+    const nItems = items.slice();
+    nItems.splice(index, 1);
+    setItems(nItems);
   };
 
   const showPrompt = () => {
-    setListTitle(`List ${lists.length + 1}`);
+    setListTitle(listTitle);
     setPromptVisible(true);
   };
   const hidePrompt = () => {
@@ -82,10 +84,10 @@ export const NewList = ({ visible, onClose }: NewListProps) => {
   };
 
   const handleSave = () => {
-    save({
+    onSave({
       items,
       title: listTitle,
-      id: uniqueId(),
+      id: list?.id || uniqueId(),
     });
     onClose();
     setItemName('');
@@ -99,13 +101,15 @@ export const NewList = ({ visible, onClose }: NewListProps) => {
     setItems([]);
   };
 
+  const backgroundColor = isDarkMode ? 'rgba(0,0,0,0.9)' : 'rgba(241, 250, 238,0.98)';
+
   return (
     <Modal
       animationType="slide"
       statusBarTranslucent={isAndroid}
       visible={visible}
       onRequestClose={handleDiscard}>
-      <SafeAreaView edges={['bottom']} style={styles.safe}>
+      <SafeAreaView edges={['bottom']} style={[styles.safe, { backgroundColor }]}>
         <View style={[styles.container, { backgroundColor }]}>
           <Header
             withBack={false}
@@ -114,7 +118,7 @@ export const NewList = ({ visible, onClose }: NewListProps) => {
                 <Text size={16}>Discard</Text>
               </TouchableOpacity>
             }
-            center={<Text style={styles.headerTitle}>New list</Text>}
+            center={<Text style={styles.headerTitle}>{list?.title || 'New list'}</Text>}
             right={
               <TouchableOpacity disabled={!items.length} onPress={showPrompt}>
                 <Text size={16} style={{ opacity: !items.length ? 0.5 : 1 }}>
@@ -141,11 +145,13 @@ export const NewList = ({ visible, onClose }: NewListProps) => {
         />
       </SafeAreaView>
       <Prompt
+        title={'List title'}
         visible={promptVisible}
         value={listTitle}
         onChangeText={setListTitle}
         noPress={hidePrompt}
         yesPress={handleSave}
+        yesText="Save"
       />
     </Modal>
   );

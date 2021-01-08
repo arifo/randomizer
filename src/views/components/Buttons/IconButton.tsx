@@ -15,7 +15,7 @@ import { sv } from 'utils/scaler';
 
 const hitSlop = { top: 15, left: 15, right: 15, bottom: 15 };
 
-type Icons = 'chevron-left' | 'close' | 'plus-circle' | 'settings';
+type Icons = 'chevron-left' | 'close' | 'plus-circle' | 'settings' | 'edit' | 'delete';
 
 interface IconButtonProps extends TouchableOpacityProps {
   iconStyle?: ImageStyle;
@@ -24,6 +24,16 @@ interface IconButtonProps extends TouchableOpacityProps {
 
 const getIcon = (variant: Icons) => {
   switch (variant) {
+    case 'delete':
+      return {
+        src: require('assets/images/delete.png'),
+        style: { width: sv(24), height: sv(24) },
+      };
+    case 'edit':
+      return {
+        src: require('assets/images/edit.png'),
+        style: { width: sv(28), height: sv(28) },
+      };
     case 'chevron-left':
       return {
         src: require('assets/images/chevron_left.png'),

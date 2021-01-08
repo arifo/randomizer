@@ -5,19 +5,16 @@ import { View, StyleSheet } from 'react-native';
 import { Container } from 'views/components/Container';
 import Header from 'views/components/Header';
 
-import { Text } from 'views/components/Text';
-
-const WordScreen = () => {
+const DicesScreen = () => {
   return (
-    <Container Header={<Header withSafeArea={false} title="Random word" />}>
+    <Container Header={<Header withSafeArea={false} title="Dices" />}>
       {/*  */}
       {/*  */}
-      <Text>Word</Text>
     </Container>
   );
 };
 
-export default WordScreen;
+export default DicesScreen;
 
 const styles = StyleSheet.create({
   container: {},

@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
 
 import { useNavigation } from '@react-navigation/native';
-import { View, TouchableOpacity, StyleSheet, useColorScheme, FlatList } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, useColorScheme } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 
 import { useSelector } from 'react-redux';
 
+import { Alert } from '@components/Alerts';
+import { IconButton, FloatingButton } from '@components/Buttons';
+import Header from '@components/Header';
+import { ListEditor } from '@components/ListEditor';
+import { Text } from '@components/Text';
 import { useAction } from 'hooks/useAction';
-import { listSortAction } from 'modules/lists/actions';
+import { listAddAction, listDeleteAction, listSortAction } from 'modules/lists/actions';
+import { ListType } from 'modules/lists/types';
 import { theme } from 'theme';
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
 
-import { IconButton } from 'views/components/Buttons';
-
-import { Container } from 'views/components/Container';
-import Header from 'views/components/Header';
-
-import { Text } from 'views/components/Text';
-
-import { NewList } from './NewList';
-
 const ListsScreen = () => {
+  const save = useAction(listAddAction);
+  const deleteList = useAction(listDeleteAction);
+
   const navigation = useNavigation();
   const isDarkMode = useColorScheme() === 'dark';
   const themeColors = isDarkMode ? theme.dark : theme.light;
@@ -31,23 +31,56 @@ const ListsScreen = () => {
 
   const { lists } = useSelector((state: RootState) => state.lists);
 
-  const [visible, setVisible] = useState(false);
+  const [modal, showModal] = useState(false);
+  const [listToDelete, setListToDelete] = useState<ListType>();
 
   const showNewList = () => {
-    setVisible(true);
+    showModal(true);
   };
   const hideNewList = () => {
-    setVisible(false);
+    showModal(false);
   };
+
+  const showDeleteAlert = (item: ListType) => {
+    setListToDelete(item);
+  };
+  const hideDeleteAlert = () => {
+    setListToDelete(undefined);
+  };
+
+  const handleDelete = () => {
+    if (listToDelete) {
+      deleteList(listToDelete?.id);
+    }
+    setListToDelete(undefined);
+  };
+
   const borderColor = isDarkMode ? '#343a40' : '#ced4da';
+
+  const renderEmptyList = () => (
+    <View style={styles.emptyList}>
+      <Text size={18} style={styles.emptyTitle}>
+        No list to randomize!
+      </Text>
+      <Text size={18} style={styles.emptyMessage}>
+        Press "Plus" button to add one.
+      </Text>
+      <FloatingButton onPress={showNewList} position="relative" />
+    </View>
+  );
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Header title="Lists" right={<IconButton icon="plus-circle" onPress={showNewList} />} />
+      <Header title="Lists" />
       <DraggableFlatList
         data={lists}
         onDragEnd={({ data }) => sortList(data)}
         keyExtractor={i => i.id}
-        contentContainerStyle={{ paddingVertical: s(20), paddingHorizontal: s(15) }}
+        contentContainerStyle={[
+          { paddingVertical: s(20), paddingHorizontal: s(15) },
+          !lists.length && { flex: 1 },
+        ]}
+        ListEmptyComponent={renderEmptyList}
         ItemSeparatorComponent={() => <View style={{ height: s(20) }} />}
         renderItem={({ item, index, drag, isActive }) => {
           return (
@@ -59,19 +92,44 @@ const ListsScreen = () => {
                   styles.card,
                   { borderColor, backgroundColor: isDarkMode ? '#212529' : '#dee2e6' },
                 ]}>
-                <Text size={15} style={{ fontWeight: 'bold' }}>
-                  {item.title}
-                </Text>
+                <View style={styles.cardTop}>
+                  <Text numberOfLines={3} size={15} style={styles.cardTitle}>
+                    {item.title}
+                  </Text>
+
+                  <View style={styles.cardAction}>
+                    <IconButton
+                      icon="delete"
+                      onPress={() => showDeleteAlert(item)}
+                      style={styles.deleteButton}
+                    />
+                  </View>
+                </View>
                 <View style={[styles.separator, { backgroundColor: borderColor }]} />
-                <Text
-                  numberOfLines={1}
-                  style={{ opacity: 0.5, fontStyle: 'italic' }}>{`${item.items.join(', ')}`}</Text>
+                <Text numberOfLines={1} style={styles.cardContent}>{`${item.items.join(
+                  ', ',
+                )}`}</Text>
               </View>
             </TouchableOpacity>
           );
         }}
       />
-      <NewList visible={visible} onClose={hideNewList} />
+
+      {lists.length > 0 && <FloatingButton onPress={showNewList} />}
+      <Alert
+        visible={!!listToDelete}
+        title={`Delete "${listToDelete?.title}"?`}
+        noText="No"
+        noPress={hideDeleteAlert}
+        yesPress={handleDelete}
+        yesText="Delete"
+      />
+      <ListEditor
+        visible={modal}
+        onClose={hideNewList}
+        onSave={save}
+        defaultListName={`List ${lists.length + 1}`}
+      />
     </View>
   );
 };
@@ -93,9 +151,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
   },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  cardAction: { width: 30, height: 20, marginLeft: 5 },
+  deleteButton: { position: 'absolute', right: 0 },
+  cardTitle: { fontWeight: 'bold', flex: 1 },
+  cardContent: { opacity: 0.5, fontStyle: 'italic' },
   separator: {
     height: 1,
     marginTop: 8,
     marginBottom: 12,
   },
+
+  emptyList: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 150 },
+  emptyTitle: { textAlign: 'center', marginBottom: 5 },
+  emptyMessage: { textAlign: 'center', marginBottom: 25 },
 });

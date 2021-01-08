@@ -13,7 +13,7 @@ import { RootState } from 'types';
 const rootPersistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['numberSettings'],
+  whitelist: ['numberSettings', 'lists'],
 };
 
 const projectReducer = combineReducers({
