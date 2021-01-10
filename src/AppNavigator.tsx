@@ -3,13 +3,14 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import DicesScreen from 'views/screens/Dices';
+import DiceRoll from 'views/screens/DiceRoll';
 import HomeScreen from 'views/screens/Home';
 import LetterScreen from 'views/screens/Letter';
 import ListRandomizer from 'views/screens/ListRandomizer';
 import ListsScreen from 'views/screens/Lists';
 import NumberScreen from 'views/screens/Number';
 import SettingsScreen from 'views/screens/Settings';
+import SpinWheel from 'views/screens/SpinWheel';
 
 const RootStack = createStackNavigator();
 const RootStackScreens = () => (
@@ -31,7 +32,8 @@ const RootStackScreens = () => (
       component={ListRandomizer}
       options={{ headerShown: false }}
     />
-    <RootStack.Screen name="DicesScreen" component={DicesScreen} options={{ headerShown: false }} />
+    <RootStack.Screen name="DiceRoll" component={DiceRoll} options={{ headerShown: false }} />
+    <RootStack.Screen name="SpinWheel" component={SpinWheel} options={{ headerShown: false }} />
 
     <RootStack.Screen
       name="SettingsScreen"

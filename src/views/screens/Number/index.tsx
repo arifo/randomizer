@@ -59,7 +59,9 @@ const NumberScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       RNShake.addEventListener('ShakeEvent', () => {
-        handleStart();
+        if (shakeToStart) {
+          handleStart();
+        }
       });
       return () => {
         RNShake.removeEventListener('ShakeEvent');

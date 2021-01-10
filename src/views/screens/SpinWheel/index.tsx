@@ -5,16 +5,16 @@ import { View, StyleSheet } from 'react-native';
 import { Container } from 'views/components/Container';
 import Header from 'views/components/Header';
 
-const DicesScreen = () => {
+const SpinWheel = () => {
   return (
-    <Container Header={<Header withSafeArea={false} title="Dices" />}>
+    <Container style={styles.container} Header={<Header withSafeArea={false} title="Spin Wheel" />}>
       {/*  */}
       {/*  */}
     </Container>
   );
 };
 
-export default DicesScreen;
+export default SpinWheel;
 
 const styles = StyleSheet.create({
   container: {},

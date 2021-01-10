@@ -92,10 +92,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 10,
     elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
+    shadowColor: 'rgba(92, 92, 92,1)',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
-    shadowRadius: 11,
+    shadowRadius: 5,
   },
   loader: {
     ...StyleSheet.absoluteFillObject,

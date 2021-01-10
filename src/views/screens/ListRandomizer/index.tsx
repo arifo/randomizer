@@ -180,6 +180,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: s(10),
     borderRadius: s(10),
+    elevation: 5,
+    shadowColor: 'rgba(219, 219, 219,1)',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
 
   overlay: {

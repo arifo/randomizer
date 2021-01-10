@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StyleSheet, Dimensions, useColorScheme } from 'react-native';
+import { StyleSheet, Dimensions, useColorScheme, View } from 'react-native';
 
 import { theme } from 'theme';
 import { s } from 'utils/scaler';
@@ -25,22 +25,34 @@ export const MenuButton = ({ title, route, onPress }: MenuButtonProps) => {
   const themeColors = isDarkMode ? theme.dark : theme.light;
 
   return (
-    <ButtonBase
-      onPress={() => onPress(route)}
-      style={{
-        height: buttonH,
-        width: buttonW,
-        borderRadius: s(15),
-        backgroundColor: themeColors.menuButton,
-      }}
-      innerStyle={styles.inner}>
-      <Text color={'white'} style={{ fontSize: s(22) }}>
-        {title}
-      </Text>
-    </ButtonBase>
+    <View style={[styles.container, { backgroundColor: themeColors.menuButton }]}>
+      <ButtonBase
+        onPress={() => onPress(route)}
+        style={{
+          height: buttonH,
+          width: buttonW,
+          borderRadius: s(15),
+          backgroundColor: themeColors.menuButton,
+        }}
+        innerStyle={styles.inner}>
+        <Text color={'white'} style={{ fontSize: s(22) }}>
+          {title}
+        </Text>
+      </ButtonBase>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    height: buttonH,
+    width: buttonW,
+    borderRadius: s(15),
+    elevation: 8,
+    shadowColor: 'rgba(92, 92, 92,0.5)',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+  },
   inner: { justifyContent: 'center', alignItems: 'center' },
 });

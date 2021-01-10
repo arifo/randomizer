@@ -32,8 +32,12 @@ const HomeScreen = () => {
       </View>
 
       <View style={styles.flexRow}>
-        <MenuButton title="List" route="ListsScreen" onPress={navToRoute} />
-        <MenuButton title="Dices" route="DicesScreen" onPress={navToRoute} />
+        <MenuButton title="Dice" route="DiceRoll" onPress={navToRoute} />
+        <MenuButton title="Lists" route="ListsScreen" onPress={navToRoute} />
+      </View>
+      <View style={styles.flexRow}>
+        {/* <MenuButton title="Images" route="ImageRandomizer" onPress={navToRoute} /> */}
+        <MenuButton title="Spin Wheel" route="SpinWheel" onPress={navToRoute} />
       </View>
     </Container>
   );

@@ -120,7 +120,7 @@ type SwitchSettingProps = {
   value: boolean;
   onChange: (value: boolean) => void;
 };
-const SettingSwitch = ({ label, value, onChange }: SwitchSettingProps) => {
+export const SettingSwitch = ({ label, value, onChange }: SwitchSettingProps) => {
   return (
     <SettingsItem label={label}>
       <Switch value={value} onValueChange={onChange} />

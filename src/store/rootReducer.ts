@@ -5,6 +5,7 @@ import { persistReducer } from 'redux-persist';
 
 import { resetStore } from 'modules/app/actions';
 import { appReducer } from 'modules/app/reducer';
+import { diceSettingsReducer } from 'modules/diceSettings/reducer';
 import { historyReducer } from 'modules/history/reducer';
 import { listsReducer } from 'modules/lists/reducer';
 import { numberSettingsReducer } from 'modules/numberSettings/reducer';
@@ -19,6 +20,7 @@ const rootPersistConfig = {
 const projectReducer = combineReducers({
   app: appReducer,
   numberSettings: numberSettingsReducer,
+  diceSettings: diceSettingsReducer,
   history: historyReducer,
   lists: listsReducer,
 });
