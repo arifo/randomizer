@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { TextInput, StyleSheet, useColorScheme } from 'react-native';
+import { TextInput, StyleSheet } from 'react-native';
 
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { BasePopup, PopupProps } from './Base';
 
@@ -12,7 +13,7 @@ interface AlertProps extends PopupProps {
 }
 
 export const Prompt = ({ value, onChangeText, yesPress, ...rest }: AlertProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
 
   const inputColor = isDarkMode ? '#ced4da' : '#f5f5f5';
 
@@ -23,7 +24,7 @@ export const Prompt = ({ value, onChangeText, yesPress, ...rest }: AlertProps) =
         value={value}
         onChangeText={onChangeText}
         style={[styles.input, { backgroundColor: inputColor }]}
-        onSubmitEditing={() => yesPress()}
+        onSubmitEditing={() => yesPress && yesPress()}
         returnKeyType="done"
       />
     </BasePopup>

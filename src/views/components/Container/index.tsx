@@ -1,18 +1,11 @@
 import React from 'react';
 
-import {
-  StyleSheet,
-  ScrollView,
-  useColorScheme,
-  KeyboardAvoidingView,
-  ViewStyle,
-  ViewProps,
-} from 'react-native';
+import { StyleSheet, ScrollView, KeyboardAvoidingView, ViewStyle, ViewProps } from 'react-native';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
-import { theme } from 'theme';
 import { isIOS } from 'utils/platforms';
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 const KeyboarAwareContainer: React.FC = ({ children }) => {
   if (isIOS) {
@@ -48,8 +41,8 @@ export const Container: React.FC<ContainerProps> = ({
   scrollEnabled,
   ...props
 }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
+
   const backgroundColor = color || themeColors.backgroundColor;
   const containerStyles: ViewStyle = {
     paddingHorizontal: padding ? s(padding) : undefined,

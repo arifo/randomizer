@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
 
-import { View, FlatList, StyleSheet, useColorScheme } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Text } from '../Text';
 
@@ -16,7 +17,7 @@ interface ListProps {
 }
 
 export const List = ({ data, listRef, onItemInput, onItemBackspace }: ListProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
   const backgroundColor = isDarkMode ? '#212529' : '#e9ecef';
 
   const renderItem = ({ item, index }: { item: string; index: number }) => {

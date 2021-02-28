@@ -56,6 +56,15 @@ const NumberScreen = () => {
 
   const hasEnded = (uniqueOnly ? Math.min(count, maxNum - minNum + 1) : count) <= randomNums.length;
 
+  const clearTimers = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       RNShake.addEventListener('ShakeEvent', () => {
@@ -65,12 +74,7 @@ const NumberScreen = () => {
       });
       return () => {
         RNShake.removeEventListener('ShakeEvent');
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
+        clearTimers();
       };
     }, []),
   );
@@ -85,6 +89,12 @@ const NumberScreen = () => {
     }
   }, [hasEnded]);
 
+  const handleStop = () => {
+    clearTimers();
+
+    setWaiting(false);
+  };
+
   const onEndReached = () => {
     Vibration.vibrate(100);
     // Toast.show({
@@ -94,25 +104,20 @@ const NumberScreen = () => {
     //   topOffset: 50,
     // });
     saveToHistory({
+      count,
       randomNumbers: randomNums,
       min: minNum,
       max: maxNum,
-      count,
       date: new Date(),
     });
     setRandomNum([]);
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    clearTimers();
   };
 
-  const generateNumber = () => {
+  const generateNumber = (numbers: number[]) => {
     let num = getRandomNum(minNum, maxNum);
-    if (uniqueOnly && randomNums.includes(num)) {
-      while (randomNums.includes(num)) {
+    if (uniqueOnly && numbers.includes(num)) {
+      while (numbers.includes(num)) {
         num = getRandomNum(minNum, maxNum);
       }
     }
@@ -134,8 +139,10 @@ const NumberScreen = () => {
 
       setWaiting(true);
       timeoutRef.current = setTimeout(() => {
-        const nextNumber = generateNumber();
-        setRandomNum(prevState => [...prevState, nextNumber]);
+        setRandomNum(prevState => {
+          const nextNumber = generateNumber(prevState);
+          return [...prevState, nextNumber];
+        });
         Vibration.vibrate(50);
         setWaiting(false);
       }, delay * 1000);
@@ -158,8 +165,10 @@ const NumberScreen = () => {
       setWaiting(true);
 
       timerRef.current = setInterval(() => {
-        const nextNumber = generateNumber();
-        setRandomNum(prevState => [...prevState, nextNumber]);
+        setRandomNum(prevState => {
+          const nextNumber = generateNumber(prevState);
+          return [...prevState, nextNumber];
+        });
         Vibration.vibrate(50);
       }, delay * 1000);
     }, [waiting, count, minNum, maxNum, randomNums, delay]),
@@ -167,6 +176,10 @@ const NumberScreen = () => {
   );
 
   const handleStart = () => {
+    if (waiting) {
+      handleStop();
+      return;
+    }
     if (autoGenerate) {
       autoRoll();
     } else {
@@ -189,6 +202,20 @@ const NumberScreen = () => {
     }
   };
 
+  const getButtonText = () => {
+    if (waiting) {
+      return autoGenerate ? 'Stop' : 'Rolling';
+    }
+    if (count === randomNums.length) {
+      return 'Reset';
+    }
+    if (count > randomNums.length && randomNums.length > 0) {
+      return 'Next';
+    }
+
+    return 'Start';
+  };
+
   const openSettings = () => {
     showSettings(true);
   };
@@ -196,8 +223,8 @@ const NumberScreen = () => {
     showSettings(false);
   };
 
-  const buttonText =
-    randomNums.length > 0 ? (count <= randomNums.length ? 'Reset' : 'Next') : 'Start';
+  const buttonText = getButtonText();
+  // randomNums.length > 0 ? (count <= randomNums.length ? 'Reset' : 'Next') : 'Start';
 
   return (
     <>
@@ -226,9 +253,7 @@ const NumberScreen = () => {
         />
 
         <View style={styles.footer}>
-          {pressToStart && (
-            <StartButton disabled={waiting} text={buttonText} onPress={handleStart} />
-          )}
+          {pressToStart && <StartButton text={buttonText} onPress={handleStart} />}
         </View>
         {randomNums.length > 0 && <Text style={styles.autoMt}>{getHintText(buttonText)}</Text>}
       </Container>

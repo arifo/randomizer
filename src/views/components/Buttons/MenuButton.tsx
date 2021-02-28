@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { StyleSheet, Dimensions, useColorScheme, View } from 'react-native';
+import { StyleSheet, Dimensions, View } from 'react-native';
 
-import { theme } from 'theme';
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Text } from '../Text';
 
@@ -21,8 +21,7 @@ const buttonW = width * 0.44;
 const buttonH = width * 0.4;
 
 export const MenuButton = ({ title, route, onPress }: MenuButtonProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.menuButton }]}>

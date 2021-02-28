@@ -1,15 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import {
-  View,
-  StyleSheet,
-  useColorScheme,
-  LayoutAnimation,
-  TouchableOpacity,
-  TextInput,
-  Switch,
-} from 'react-native';
-
+import { View, StyleSheet, TextInput, Switch } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { useAction } from 'hooks/useAction';
@@ -27,52 +18,9 @@ import {
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
 import { isNumber } from 'utils/strings';
-import { ButtonBase } from 'views/components/Buttons';
 import { FullscreenModal } from 'views/components/FullscreenModal';
-import { Text } from 'views/components/Text';
-
-const SettingsItem: React.FC<{ label: string }> = ({ label, children }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const [hintVisible, showHint] = useState(false);
-
-  const toggleHint = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    showHint(!hintVisible);
-  };
-
-  const hideHint = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    showHint(false);
-  };
-
-  const borderColor = isDarkMode ? '#343a40' : '#ced4da';
-
-  return (
-    <View style={[styles.settingItem, { borderBottomColor: borderColor }]}>
-      <View style={styles.settingButtonWrapper}>
-        <ButtonBase
-          onPress={toggleHint}
-          innerStyle={styles.settingBtnInner}
-          style={styles.settingsBtn}>
-          <Text size={18}>{label}</Text>
-        </ButtonBase>
-
-        <View style={[styles.settingRight, { backgroundColor: borderColor }]}>{children}</View>
-      </View>
-      {hintVisible && (
-        <TouchableOpacity activeOpacity={0.8} onPress={hideHint}>
-          <View style={styles.ph}>
-            <Text>
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-              has been the industry's standard dummy text ever since the 1500s, when an unknown
-              printer took a galley of type and scrambled it to make a type specimen book.
-            </Text>
-          </View>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-};
+import { SettingsItem } from 'views/components/SettingsItem';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 type InputSettingProps = {
   label: string;
@@ -83,8 +31,7 @@ type InputSettingProps = {
 };
 
 const SettingInput = ({ label, value, onBlur, onSubmitEditing, onChange }: InputSettingProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
-
+  const { isDarkMode } = useAppTheme();
   const handleInput = (t: string) => {
     if (!t) {
       onChange(t);
@@ -244,35 +191,6 @@ export const NumberSettings = ({ visible, onClose }: SettingsProps) => {
 };
 
 const styles = StyleSheet.create({
-  settingItem: {
-    borderBottomWidth: 1,
-    marginHorizontal: 20,
-  },
-  settingButtonWrapper: {
-    flexDirection: 'row',
-    height: s(50),
-  },
-  settingsBtn: { width: 'auto', height: 'auto', flex: 1, backgroundColor: 'transparent' },
-  settingBtnInner: { justifyContent: 'center', paddingHorizontal: 0 },
-
-  settingRight: {
-    flex: 0.3,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    margin: 3,
-  },
-
-  restoreBtn: {
-    height: 'auto',
-    width: 'auto',
-    marginHorizontal: s(20),
-    marginTop: 45,
-    borderRadius: s(50),
-  },
-  restoreInner: { justifyContent: 'center', alignItems: 'center', padding: s(12) },
-  ph: { paddingVertical: 8 },
-
   input: {
     fontSize: s(17),
     textAlign: 'center',

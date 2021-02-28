@@ -1,15 +1,9 @@
 import React from 'react';
 
-import {
-  View,
-  StyleSheet,
-  TextInputProps,
-  TextStyle,
-  KeyboardAvoidingView,
-  useColorScheme,
-} from 'react-native';
+import { View, StyleSheet, TextInputProps, TextStyle, KeyboardAvoidingView } from 'react-native';
 
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Input } from './Input';
 
@@ -20,7 +14,8 @@ interface InputFieldProps extends TextInputProps {
 }
 
 export const InputField = ({ actionButton, ...props }: InputFieldProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
+
   const backgroundColor = isDarkMode ? '#6c757d' : '#dee2e6';
   const inputColor = isDarkMode ? '#212529' : '#6c757d';
   return (

@@ -1,16 +1,9 @@
 import React from 'react';
 
-import {
-  Text as RnText,
-  StyleSheet,
-  useColorScheme,
-  StyleProp,
-  TextStyle,
-  TextProps,
-} from 'react-native';
+import { Text as RnText, StyleProp, TextStyle, TextProps } from 'react-native';
 
-import { theme } from 'theme';
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 export interface RNTextProps extends TextProps {
   // font?: keyof typeof Fonts;
@@ -20,8 +13,8 @@ export interface RNTextProps extends TextProps {
 }
 
 export const Text: React.FC<RNTextProps> = ({ children, size, color, style, ...restProps }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
+
   const fontSize = typeof size === 'number' ? s(size) : undefined;
   return (
     <RnText {...restProps} style={[{ color: color || themeColors.text, fontSize }, style]}>
@@ -29,9 +22,3 @@ export const Text: React.FC<RNTextProps> = ({ children, size, color, style, ...r
     </RnText>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

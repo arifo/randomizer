@@ -1,16 +1,17 @@
 import { createReducer } from 'deox';
 import produce from 'immer';
+import { Appearance } from 'react-native';
 
-import { fooAction } from './actions';
+import { setDarkAction } from './actions';
 
 const initialState = {
-  foo: 'bar',
+  darkMode: Appearance.getColorScheme() === 'dark',
 };
 
 export const appReducer = createReducer(initialState, handle => [
-  handle(fooAction, state =>
+  handle(setDarkAction, (state, { payload }) =>
     produce(state, draft => {
-      draft.foo = 'baz';
+      draft.darkMode = payload;
     }),
   ),
 ]);

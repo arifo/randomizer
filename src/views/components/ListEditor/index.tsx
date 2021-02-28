@@ -1,13 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
 
-import { View, StyleSheet, useColorScheme, FlatList, Modal, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, Modal, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ListType } from 'modules/lists/types';
 import { isAndroid } from 'utils/platforms';
 import { s } from 'utils/scaler';
 import { uniqueId } from 'utils/strings';
+
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Prompt } from '../Alerts';
 import { IconButton } from '../Buttons';
@@ -33,7 +35,7 @@ export const ListEditor = ({
   onClose,
 }: ListEditorProps) => {
   const listRef = useRef<FlatList<string> | null>();
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
 
   const [listTitle, setListTitle] = useState(list?.title || defaultListName || '');
   const [items, setItems] = useState<string[]>(list?.items || []);
@@ -43,7 +45,6 @@ export const ListEditor = ({
 
   useEffect(() => {
     if (list) {
-      setListTitle(list.title);
       setItems(list.items);
     }
     if (defaultListName) {

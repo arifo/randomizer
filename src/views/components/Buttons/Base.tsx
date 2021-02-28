@@ -9,12 +9,10 @@ import {
   StyleProp,
   ViewStyle,
   StyleSheet,
-  useColorScheme,
 } from 'react-native';
 
-import { theme } from 'theme';
-
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 export type ButtonBaseProps = ViewProps & {
   onPress?: () => void;
@@ -42,8 +40,8 @@ export const ButtonBase: React.FC<ButtonBaseProps> = ({
   color,
   ...rest
 }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
+
   const containerStyles = [
     styles.container,
     { backgroundColor: color || themeColors.menuButton },

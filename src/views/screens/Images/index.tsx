@@ -1,14 +1,13 @@
 import React from 'react';
 
-import { View, StyleSheet, useColorScheme } from 'react-native';
-
-import { theme } from 'theme';
+import { View, StyleSheet } from 'react-native';
 
 import Header from 'views/components/Header';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 const ImageRandomizer = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
+
   const backgroundColor = themeColors.backgroundColor;
   return (
     <View style={[styles.container, { backgroundColor }]}>

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { StyleSheet, Dimensions, useColorScheme, View } from 'react-native';
+import { StyleSheet, Dimensions, View } from 'react-native';
 
-import { theme } from 'theme';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Text } from '../Text';
 
@@ -17,8 +17,8 @@ interface StartButtonProps {
 }
 
 export const StartButton = ({ disabled, text, onPress }: StartButtonProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.startButton }]}>
       <ButtonBase

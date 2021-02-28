@@ -1,14 +1,9 @@
 import React from 'react';
 
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  useColorScheme,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Text } from '../Text';
 
@@ -21,7 +16,7 @@ export interface PopupProps {
   yesText?: string;
 }
 
-const ActionButton = ({ text, onPress }: { text: string; onPress: () => void }) => {
+const ActionButton = ({ text, onPress }: { text: string; onPress?: () => void }) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.actionButton}>
       <Text size={16}>{text}</Text>
@@ -38,7 +33,8 @@ export const BasePopup: React.FC<PopupProps> = ({
   yesText,
   title,
 }) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
+
   if (!visible) {
     return null;
   }

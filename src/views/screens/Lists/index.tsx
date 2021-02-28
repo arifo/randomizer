@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { useNavigation } from '@react-navigation/native';
-import { View, TouchableOpacity, StyleSheet, useColorScheme } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 
 import { useSelector } from 'react-redux';
@@ -14,17 +14,19 @@ import { Text } from '@components/Text';
 import { useAction } from 'hooks/useAction';
 import { listAddAction, listDeleteAction, listSortAction } from 'modules/lists/actions';
 import { ListType } from 'modules/lists/types';
-import { theme } from 'theme';
+
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 const ListsScreen = () => {
   const save = useAction(listAddAction);
   const deleteList = useAction(listDeleteAction);
 
   const navigation = useNavigation();
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+
+  const { isDarkMode, themeColors } = useAppTheme();
+
   const backgroundColor = themeColors.backgroundColor;
 
   const sortList = useAction(listSortAction);
@@ -90,7 +92,12 @@ const ListsScreen = () => {
               <View
                 style={[
                   styles.card,
-                  { borderColor, backgroundColor: isDarkMode ? '#212529' : '#dee2e6' },
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  {
+                    borderColor,
+                    shadowColor: themeColors.shadowColor,
+                    backgroundColor: isDarkMode ? '#212529' : '#dee2e6',
+                  },
                 ]}>
                 <View style={styles.cardTop}>
                   <Text numberOfLines={3} size={15} style={styles.cardTitle}>
@@ -145,8 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     borderRadius: 15,
     borderWidth: 1,
-    elevation: 5,
-    shadowColor: 'rgba(219, 219, 219,1)',
+    elevation: 3,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.5,
     shadowRadius: 5,

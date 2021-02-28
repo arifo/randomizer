@@ -5,6 +5,7 @@ const dark = {
   startButton: '#1d3557',
   iconButton: '#dee2e6',
   loader: '#84a59d',
+  shadowColor: 'rgba(219, 219, 219,0.1)',
 };
 
 const light = {
@@ -14,6 +15,7 @@ const light = {
   startButton: '#1d3557',
   iconButton: '#1d3557',
   loader: '#0077b6',
+  shadowColor: 'rgba(92, 92, 92,1)',
 };
 
 export const theme = {

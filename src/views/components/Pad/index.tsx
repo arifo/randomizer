@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import { View, StyleSheet, useColorScheme, Dimensions, ViewStyle } from 'react-native';
-import { Chase, Wander } from 'react-native-animated-spinkit';
+import { View, StyleSheet, Dimensions, ViewStyle } from 'react-native';
+import { Wander } from 'react-native-animated-spinkit';
 
-import { theme } from 'theme';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Text } from '../Text';
 
@@ -36,13 +36,17 @@ export const Pad: React.FC<PadProps> = ({
   progress,
   placeholder,
 }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { isDarkMode, themeColors } = useAppTheme();
 
   const padColor = isDarkMode ? '#212529' : '#dee2e6';
 
   return (
-    <View style={[styles.container, { backgroundColor: padColor, width, height }, style]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: padColor, shadowColor: themeColors.shadowColor, width, height },
+        style,
+      ]}>
       {loading && !content && (
         <Text
           adjustsFontSizeToFit
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 10,
     elevation: 8,
-    shadowColor: 'rgba(92, 92, 92,1)',
+    // shadowColor: 'rgba(92, 92, 92,1)',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
     shadowRadius: 5,

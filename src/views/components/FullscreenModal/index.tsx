@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { View, StyleSheet, Modal, useColorScheme } from 'react-native';
+import { View, StyleSheet, Modal } from 'react-native';
 
 import { isAndroid } from 'utils/platforms';
 import { s, sv } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { IconButton } from '../Buttons';
 import { Container } from '../Container';
@@ -44,7 +45,7 @@ export const FullscreenModal = ({
   OverlayComponent,
   scrollEnabled = true,
 }: FullscreenModalProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
 
   return (
     <Modal

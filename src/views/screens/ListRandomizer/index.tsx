@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 
 import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
 
-import { View, StyleSheet, FlatList, useColorScheme, Dimensions, Vibration } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions, Vibration } from 'react-native';
 
 import RNShake from 'react-native-shake';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ import { useAction } from 'hooks/useAction';
 import { useDebounceCallback } from 'hooks/useDebounce';
 import { listEditAction } from 'modules/lists/actions';
 import { getRandomNum } from 'randomizer';
-import { theme } from 'theme';
+
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
 import { StartButton, IconButton } from 'views/components/Buttons';
@@ -20,6 +20,7 @@ import Header from 'views/components/Header';
 import { Pad } from 'views/components/Pad';
 import { RolledItems } from 'views/components/RolledItems';
 import { Text } from 'views/components/Text';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 const { width: wWidth, height: wHeight } = Dimensions.get('window');
 
@@ -29,9 +30,8 @@ const ListRandomizer = () => {
   const save = useAction(listEditAction);
 
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const { themeColors, isDarkMode } = useAppTheme();
 
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
   const backgroundColor = themeColors.backgroundColor;
 
   const route = useRoute<RouteProp<{ ListRandomizer: { id: string } }, 'ListRandomizer'>>();
@@ -123,11 +123,16 @@ const ListRandomizer = () => {
         contentContainerStyle={{ paddingTop: s(20), paddingBottom: s(280) }}
         renderItem={({ item, index }) => {
           const backgroundColor = isDarkMode
-            ? `rgba(33, 37, 41,${index % 2 === 0 ? 1 : 0.5})`
-            : `rgba(222, 226, 230, ${index % 2 === 0 ? 1 : 0.5})`;
+            ? index % 2 === 0
+              ? '#212529'
+              : '#313438'
+            : index % 2 === 0
+            ? '#edf0f2'
+            : '#f0f7ff';
 
           return (
-            <View style={[styles.listItem, { backgroundColor }]}>
+            <View
+              style={[styles.listItem, { backgroundColor, shadowColor: themeColors.shadowColor }]}>
               <Text size={18}>{item}</Text>
             </View>
           );
@@ -164,7 +169,13 @@ const ListRandomizer = () => {
           onPress={rollOnce}
         />
       </View>
-      <ListEditor list={list} visible={editorVisible} onClose={hideEditor} onSave={save} />
+      <ListEditor
+        list={list}
+        visible={editorVisible}
+        defaultListName={list?.title}
+        onClose={hideEditor}
+        onSave={save}
+      />
     </View>
   );
 };
@@ -180,8 +191,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: s(10),
     borderRadius: s(10),
-    elevation: 5,
-    shadowColor: 'rgba(219, 219, 219,1)',
+    elevation: 2,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 3,

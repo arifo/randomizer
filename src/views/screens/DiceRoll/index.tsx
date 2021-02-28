@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useFocusEffect } from '@react-navigation/native';
-import { View, StyleSheet, useColorScheme, Vibration, Animated } from 'react-native';
+import { View, StyleSheet, Vibration, Animated } from 'react-native';
 import RNShake from 'react-native-shake';
 import { useSelector } from 'react-redux';
 
@@ -11,9 +11,11 @@ import { Text } from '@components/Text';
 
 import { useDebounceCallback } from 'hooks/useDebounce';
 import { getRandomNum } from 'randomizer';
-import { theme } from 'theme';
+
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
+
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Dice } from './Dice';
 import { DiceSettings } from './Settings';
@@ -22,8 +24,8 @@ const DiceColors = ['#087e8b', '#f25f5c', '#ffbd00', '#55a630', '#5f0f40', '#0b3
 
 const DiceRoll = () => {
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
+
   const backgroundColor = themeColors.backgroundColor;
 
   const [settingsVisible, showSettings] = useState(false);
@@ -125,7 +127,7 @@ const DiceRoll = () => {
   });
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Header title={'Dice roll'} right={<IconButton icon="settings" onPress={openSettings} />} />
+      <Header title={'Dice roll'} right={<IconButton icon="edit" onPress={openSettings} />} />
 
       <View style={styles.content}>
         <View style={styles.diceWrapper}>

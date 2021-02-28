@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Slider from '@react-native-community/slider';
-import { View, StyleSheet, useColorScheme } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { FullscreenModal } from '@components/FullscreenModal';
@@ -10,6 +10,7 @@ import { useAction } from 'hooks/useAction';
 import { setDiceCount, setPressToStart, setShakeToStart } from 'modules/diceSettings/actions';
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { SettingSwitch } from '../Number/Settings';
 
@@ -19,8 +20,7 @@ interface SettingsProps {
 }
 
 export const DiceSettings = ({ visible, onClose }: SettingsProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
-
+  const { isDarkMode } = useAppTheme();
   const setCountAction = useAction(setDiceCount);
   const setPressStart = useAction(setPressToStart);
   const setShakeStart = useAction(setShakeToStart);

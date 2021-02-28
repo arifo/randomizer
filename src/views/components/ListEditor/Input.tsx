@@ -3,17 +3,18 @@ import React, { useState } from 'react';
 import {
   TextInput,
   StyleSheet,
-  useColorScheme,
   TextInputProps,
   NativeSyntheticEvent,
   TextInputFocusEventData,
 } from 'react-native';
 
 import { s } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 export const Input = ({ style, onFocus, onBlur, ...props }: TextInputProps) => {
   const [isFocused, setFocused] = useState(false);
-  const isDarkMode = useColorScheme() === 'dark';
+  const { isDarkMode } = useAppTheme();
+
   const borderColor = isDarkMode ? '#6c757d' : '#dee2e6';
   const color = isDarkMode ? 'white' : 'black';
   const borderBottomWidth = isFocused ? 3 : 1;

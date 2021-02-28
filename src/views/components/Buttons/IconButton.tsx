@@ -5,13 +5,11 @@ import {
   Image,
   StyleSheet,
   TouchableOpacityProps,
-  useColorScheme,
   ImageStyle,
 } from 'react-native';
 
-import { theme } from 'theme';
-
 import { sv } from 'utils/scaler';
+import { useAppTheme } from 'views/contexts/useAppTheme';
 
 const hitSlop = { top: 15, left: 15, right: 15, bottom: 15 };
 
@@ -60,8 +58,7 @@ const getIcon = (variant: Icons) => {
 };
 
 export const IconButton = ({ iconStyle, icon, ...props }: IconButtonProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeColors = isDarkMode ? theme.dark : theme.light;
+  const { themeColors } = useAppTheme();
   const tintColor = themeColors.iconButton;
 
   const { src, style } = getIcon(icon);

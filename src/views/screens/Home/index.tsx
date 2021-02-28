@@ -23,7 +23,7 @@ const HomeScreen = () => {
           withSafeArea={false}
           withBack={false}
           title="Randomize"
-          // right={<IconButton icon="settings" onPress={() => navToRoute('SettingsScreen')} />}
+          right={<IconButton icon="settings" onPress={() => navToRoute('SettingsScreen')} />}
         />
       }>
       <View style={styles.flexRow}>
@@ -36,8 +36,8 @@ const HomeScreen = () => {
         <MenuButton title="Lists" route="ListsScreen" onPress={navToRoute} />
       </View>
       <View style={styles.flexRow}>
-        {/* <MenuButton title="Images" route="ImageRandomizer" onPress={navToRoute} /> */}
-        <MenuButton title="Spin Wheel" route="SpinWheel" onPress={navToRoute} />
+        {/* <MenuButton title="Images" route="ImageRandomizer" onPress={navToRoute} />
+        <MenuButton title="Spin Wheel" route="SpinWheel" onPress={navToRoute} /> */}
       </View>
     </Container>
   );
