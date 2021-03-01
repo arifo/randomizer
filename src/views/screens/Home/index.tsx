@@ -22,7 +22,7 @@ const HomeScreen = () => {
         <Header
           withSafeArea={false}
           withBack={false}
-          title="Randomize"
+          title="Random"
           right={<IconButton icon="settings" onPress={() => navToRoute('SettingsScreen')} />}
         />
       }>
