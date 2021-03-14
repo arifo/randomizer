@@ -18,7 +18,7 @@ const initialState: NumberSettingsState = {
   minNum: 1,
   maxNum: 20,
   count: 5,
-  delay: 2,
+  delay: 1,
   autoGenerate: false,
   uniqueOnly: true,
   pressToStart: true,
