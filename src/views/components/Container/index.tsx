@@ -68,5 +68,4 @@ export const Container: React.FC<ContainerProps> = ({
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  container: {},
 });

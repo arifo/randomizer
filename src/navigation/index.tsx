@@ -12,34 +12,22 @@ import NumberScreen from 'views/screens/Number';
 import SettingsScreen from 'views/screens/Settings';
 import SpinWheel from 'views/screens/SpinWheel';
 
-const RootStack = createStackNavigator();
-const RootStackScreens = () => (
-  <RootStack.Navigator>
-    <RootStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-    <RootStack.Screen
-      name="NumberScreen"
-      component={NumberScreen}
-      options={{ headerShown: false }}
-    />
-    <RootStack.Screen
-      name="LetterScreen"
-      component={LetterScreen}
-      options={{ headerShown: false }}
-    />
-    <RootStack.Screen name="ListsScreen" component={ListsScreen} options={{ headerShown: false }} />
-    <RootStack.Screen
-      name="ListRandomizer"
-      component={ListRandomizer}
-      options={{ headerShown: false }}
-    />
-    <RootStack.Screen name="DiceRoll" component={DiceRoll} options={{ headerShown: false }} />
-    <RootStack.Screen name="SpinWheel" component={SpinWheel} options={{ headerShown: false }} />
+import { RootStackParamList } from './list';
 
-    <RootStack.Screen
-      name="SettingsScreen"
-      component={SettingsScreen}
-      options={{ headerShown: false }}
-    />
+const options = { headerShown: false };
+
+const RootStack = createStackNavigator<RootStackParamList>();
+const RootStackScreens = () => (
+  <RootStack.Navigator screenOptions={options}>
+    <RootStack.Screen name="Home" component={HomeScreen} />
+    <RootStack.Screen name="NumberScreen" component={NumberScreen} />
+    <RootStack.Screen name="LetterScreen" component={LetterScreen} />
+    <RootStack.Screen name="ListsScreen" component={ListsScreen} />
+    <RootStack.Screen name="ListRandomizer" component={ListRandomizer} />
+    <RootStack.Screen name="DiceRoll" component={DiceRoll} />
+    <RootStack.Screen name="SpinWheel" component={SpinWheel} />
+
+    <RootStack.Screen name="SettingsScreen" component={SettingsScreen} />
   </RootStack.Navigator>
 );
 

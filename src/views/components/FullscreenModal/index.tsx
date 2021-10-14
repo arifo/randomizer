@@ -21,20 +21,6 @@ interface FullscreenModalProps {
   accessibilityLabel?: string;
 }
 
-const ModalHeader = ({ onClose, title }: { onClose?: () => void; title?: string }) => (
-  <View style={styles.modalHeader}>
-    <View style={styles.mHeaderSides} />
-    <View style={styles.mHeaderCenter}>
-      <Text size={18} style={styles.title}>
-        {title}
-      </Text>
-    </View>
-    <View style={styles.mHeaderRight}>
-      <IconButton icon="close" onPress={onClose} />
-    </View>
-  </View>
-);
-
 export const FullscreenModal = ({
   visible,
   onClose,
@@ -66,6 +52,20 @@ export const FullscreenModal = ({
     </Modal>
   );
 };
+
+const ModalHeader = ({ onClose, title }: { onClose?: () => void; title?: string }) => (
+  <View style={styles.modalHeader}>
+    <View style={styles.mHeaderSides} />
+    <View style={styles.mHeaderCenter}>
+      <Text size={18} style={styles.title}>
+        {title}
+      </Text>
+    </View>
+    <View style={styles.mHeaderRight}>
+      <IconButton name="close" onPress={onClose} />
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
   modalHeader: {

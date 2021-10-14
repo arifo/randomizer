@@ -5,16 +5,13 @@ import { View, StyleSheet, Vibration, Animated } from 'react-native';
 import RNShake from 'react-native-shake';
 import { useSelector } from 'react-redux';
 
-import { IconButton, StartButton } from '@components/Buttons';
-import Header from '@components/Header';
-import { Text } from '@components/Text';
-
 import { useDebounceCallback } from 'hooks/useDebounce';
 import { getRandomNum } from 'randomizer';
-
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
-
+import { IconButton, StartButton } from 'views/components/Buttons';
+import Header from 'views/components/Header';
+import { Text } from 'views/components/Text';
 import { useAppTheme } from 'views/contexts/useAppTheme';
 
 import { Dice } from './Dice';
@@ -22,11 +19,11 @@ import { DiceSettings } from './Settings';
 
 const DiceColors = ['#087e8b', '#f25f5c', '#ffbd00', '#55a630', '#5f0f40', '#0b3954'];
 
-const DiceRoll = () => {
+const DiceRollScreen = () => {
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const { themeColors } = useAppTheme();
-
-  const backgroundColor = themeColors.backgroundColor;
+  const {
+    themeColors: { backgroundColor },
+  } = useAppTheme();
 
   const [settingsVisible, showSettings] = useState(false);
   const [waiting, setWaiting] = useState(false);
@@ -44,28 +41,47 @@ const DiceRoll = () => {
     setDiceValues(Array(diceCount).fill(6));
   }, [diceCount]);
 
-  const openSettings = () => {
+  const openSettings = useCallback(() => {
     showSettings(true);
-  };
-  const closeSettings = () => {
+  }, []);
+  const closeSettings = useCallback(() => {
     showSettings(false);
-  };
+  }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      RNShake.addEventListener('ShakeEvent', () => {
-        if (shakeToStart) {
-          rollOnce();
+  const startShake = useCallback(
+    (onFinishCb: () => void) => {
+      const dir = getRandomNum(0, 1);
+      const value = getRandomNum(15, 25) * (dir > 0 ? 1 : -1);
+      const dur = getRandomNum(75, 100);
+
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transY, { toValue: 0, duration: dur, useNativeDriver: true }),
+        ]),
+        Animated.sequence([
+          Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
+          Animated.timing(transX, { toValue: 0, duration: dur, useNativeDriver: true }),
+        ]),
+      ]).start(({ finished }) => {
+        if (finished) {
+          onFinishCb();
         }
       });
-      return () => {
-        RNShake.removeEventListener('ShakeEvent');
-
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }, [shakeToStart]),
+    },
+    [transX, transY],
   );
 
   const rollOnce = useDebounceCallback(
@@ -82,42 +98,26 @@ const DiceRoll = () => {
         Vibration.vibrate(50);
         setWaiting(false);
       });
-    }, [waiting, diceCount, diceValues]),
+    }, [waiting, startShake, diceValues]),
     100,
   );
 
-  const startShake = (onFinishCb: () => void) => {
-    const dir = getRandomNum(0, 1);
-    const value = getRandomNum(15, 25) * (dir > 0 ? 1 : -1);
-    const dur = getRandomNum(75, 100);
+  useFocusEffect(
+    useCallback(() => {
+      RNShake.addEventListener('ShakeEvent', () => {
+        if (shakeToStart) {
+          rollOnce();
+        }
+      });
+      return () => {
+        RNShake.removeEventListener('ShakeEvent');
 
-    Animated.parallel([
-      Animated.sequence([
-        Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transY, { toValue: 0, duration: dur, useNativeDriver: true }),
-      ]),
-      Animated.sequence([
-        Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: -value, duration: dur, useNativeDriver: true }),
-        Animated.timing(transX, { toValue: 0, duration: dur, useNativeDriver: true }),
-      ]),
-    ]).start(({ finished }) => {
-      if (finished) {
-        onFinishCb();
-      }
-    });
-  };
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, [rollOnce, shakeToStart]),
+  );
 
   const diceData = diceValues.map((value, index) => {
     return {
@@ -127,7 +127,7 @@ const DiceRoll = () => {
   });
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Header title={'Dice roll'} right={<IconButton icon="edit" onPress={openSettings} />} />
+      <Header title={'Dice roll'} right={<IconButton name="edit" onPress={openSettings} />} />
 
       <View style={styles.content}>
         <View style={styles.diceWrapper}>
@@ -160,7 +160,7 @@ const DiceRoll = () => {
   );
 };
 
-export default DiceRoll;
+export default DiceRollScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

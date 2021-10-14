@@ -8,8 +8,12 @@ import {
   ImageStyle,
 } from 'react-native';
 
+import { IconNames } from 'assets/images';
+
 import { sv } from 'utils/scaler';
 import { useAppTheme } from 'views/contexts/useAppTheme';
+
+import { Icon } from '../Icon';
 
 const hitSlop = { top: 15, left: 15, right: 15, bottom: 15 };
 
@@ -57,24 +61,35 @@ const getIcon = (variant: Icons) => {
   }
 };
 
-export const IconButton = ({ iconStyle, icon, ...props }: IconButtonProps) => {
+// export const IconButton = ({ iconStyle, icon, ...props }: IconButtonProps) => {
+//   const { themeColors } = useAppTheme();
+//   const tintColor = themeColors.iconButton;
+
+//   const { src, style } = getIcon(icon);
+
+//   if (!src) {
+//     return null;
+//   }
+
+//   return (
+//     <TouchableOpacity hitSlop={hitSlop} {...props}>
+//       <Image source={src} style={[styles.icon, style, { tintColor: tintColor, ...iconStyle }]} />
+//     </TouchableOpacity>
+//   );
+// };
+
+interface Props extends TouchableOpacityProps {
+  name: IconNames;
+  size?: number;
+  color?: string;
+}
+
+export const IconButton = ({ style, name, size, color, ...props }: Props) => {
   const { themeColors } = useAppTheme();
   const tintColor = themeColors.iconButton;
-
-  const { src, style } = getIcon(icon);
-
-  if (!src) {
-    return null;
-  }
-
   return (
-    <TouchableOpacity hitSlop={hitSlop} {...props}>
-      <Image source={src} style={[styles.icon, style, { tintColor: tintColor, ...iconStyle }]} />
+    <TouchableOpacity activeOpacity={0.5} hitSlop={hitSlop} {...props} style={style}>
+      <Icon name={name} size={size} color={color || tintColor} />
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {},
-  icon: { width: sv(24), height: sv(24) },
-});

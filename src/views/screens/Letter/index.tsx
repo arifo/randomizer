@@ -4,15 +4,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, StyleSheet, Dimensions, Vibration } from 'react-native';
 import RNShake from 'react-native-shake';
 
-import { StartButton } from '@components/Buttons';
-import { Container } from '@components/Container';
-import Header from '@components/Header';
-import { Pad } from '@components/Pad';
-import { RolledItems } from '@components/RolledItems';
-import { Text } from '@components/Text';
 import { useDebounceCallback } from 'hooks/useDebounce';
 import { getRandomNum } from 'randomizer';
 import { s } from 'utils/scaler';
+import { StartButton } from 'views/components/Buttons';
+import { Container } from 'views/components/Container';
+import Header from 'views/components/Header';
+import { Pad } from 'views/components/Pad';
+import { RolledItems } from 'views/components/RolledItems';
+import { Text } from 'views/components/Text';
 
 import { Alphabet } from './data';
 
@@ -25,22 +25,12 @@ const LetterScreen = () => {
   const [waiting, setWaiting] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  useFocusEffect(
-    useCallback(() => {
-      RNShake.addEventListener('ShakeEvent', () => {
-        rollOnce();
-      });
-      return () => {
-        RNShake.removeEventListener('ShakeEvent');
+  const onEndReached = useCallback(() => {
+    Vibration.vibrate(100);
+    setLetters([]);
+  }, []);
 
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }, []),
-  );
-
-  const generateLetter = () => {
+  const generateLetter = useCallback(() => {
     const index = getRandomNum(0, Alphabet.en.length - 1);
     let letter = Alphabet.en[index];
 
@@ -51,12 +41,7 @@ const LetterScreen = () => {
       }
     }
     return letter;
-  };
-
-  const onEndReached = () => {
-    Vibration.vibrate(100);
-    setLetters([]);
-  };
+  }, [letters]);
 
   const rollOnce = useDebounceCallback(
     useCallback(() => {
@@ -76,8 +61,22 @@ const LetterScreen = () => {
         Vibration.vibrate(50);
         setWaiting(false);
       }, 1 * 1000);
-    }, [waiting, letters]),
+    }, [waiting, letters.length, onEndReached, generateLetter]),
     100,
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      RNShake.addEventListener('ShakeEvent', () => {
+        rollOnce();
+      });
+      return () => {
+        RNShake.removeEventListener('ShakeEvent');
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, [rollOnce]),
   );
 
   return (

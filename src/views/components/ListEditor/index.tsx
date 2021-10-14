@@ -127,6 +127,7 @@ export const ListEditor = ({
                 </Text>
               </TouchableOpacity>
             }
+            sidesFlex={1}
           />
 
           <List
@@ -142,7 +143,7 @@ export const ListEditor = ({
         <InputField
           value={itemName}
           onChangeText={setItemName}
-          actionButton={<IconButton icon="plus-circle" onPress={handleAddItem} />}
+          actionButton={<IconButton name="plusCircle" onPress={handleAddItem} />}
         />
       </SafeAreaView>
       <Prompt

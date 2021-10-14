@@ -1,22 +1,20 @@
 import React, { useCallback, useRef, useState } from 'react';
 
-import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
-
+import { useFocusEffect } from '@react-navigation/native';
 import { View, StyleSheet, FlatList, Dimensions, Vibration } from 'react-native';
-
 import RNShake from 'react-native-shake';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { ListEditor } from '@components/ListEditor';
-import { useAction } from 'hooks/useAction';
 import { useDebounceCallback } from 'hooks/useDebounce';
 import { listEditAction } from 'modules/lists/actions';
+import { ListType } from 'modules/lists/types';
+import { RootStackComponent } from 'navigation/list';
 import { getRandomNum } from 'randomizer';
-
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
 import { StartButton, IconButton } from 'views/components/Buttons';
 import Header from 'views/components/Header';
+import { ListEditor } from 'views/components/ListEditor';
 import { Pad } from 'views/components/Pad';
 import { RolledItems } from 'views/components/RolledItems';
 import { Text } from 'views/components/Text';
@@ -26,57 +24,37 @@ const { width: wWidth, height: wHeight } = Dimensions.get('window');
 
 const numPadH = wHeight * 0.35;
 
-const ListRandomizer = () => {
-  const save = useAction(listEditAction);
-
+const ListRandomizer: RootStackComponent<'ListRandomizer'> = ({ route }) => {
+  const dispatch = useDispatch();
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const { themeColors, isDarkMode } = useAppTheme();
+  const {
+    isDarkMode,
+    themeColors: { backgroundColor, shadowColor },
+  } = useAppTheme();
 
-  const backgroundColor = themeColors.backgroundColor;
-
-  const route = useRoute<RouteProp<{ ListRandomizer: { id: string } }, 'ListRandomizer'>>();
   const { id } = route.params;
   const { lists } = useSelector((state: RootState) => state.lists);
   const list = lists.find(i => i.id === id);
 
-  const [editorVisible, setEditorVisible] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [editorVisible, setEditorVisible] = useState(false);
   const [rolledItems, setRolledItems] = useState<string[]>([]);
   const [waiting, setWaiting] = useState(false);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      RNShake.addEventListener('ShakeEvent', () => {
-        rollOnce();
-      });
-      return () => {
-        RNShake.removeEventListener('ShakeEvent');
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }, []),
-  );
-
-  const generateNext = () => {
+  const generateNext = useCallback(() => {
     if (list?.items) {
-      const index = getRandomNum(0, list?.items.length - 1);
-      let item = list?.items[index];
+      const index = getRandomNum(0, list.items.length - 1);
+      let item = list.items[index];
 
       if (rolledItems.includes(item)) {
         while (rolledItems.includes(item)) {
-          const newIndex = getRandomNum(0, list?.items.length - 1);
-          item = list?.items[newIndex];
+          const newIndex = getRandomNum(0, list.items.length - 1);
+          item = list.items[newIndex];
         }
       }
       return item;
     }
-  };
-
-  const onEndReached = () => {
-    Vibration.vibrate(100);
-    setRolledItems([]);
-  };
+  }, [rolledItems, list?.items]);
 
   const rollOnce = useDebounceCallback(
     useCallback(() => {
@@ -99,22 +77,49 @@ const ListRandomizer = () => {
         Vibration.vibrate(50);
         setWaiting(false);
       }, 1 * 1000);
-    }, [waiting, rolledItems]),
+    }, [waiting, rolledItems, generateNext, list?.items]),
     100,
   );
 
-  const showEditor = () => {
+  useFocusEffect(
+    useCallback(() => {
+      RNShake.addEventListener('ShakeEvent', () => {
+        rollOnce();
+      });
+      return () => {
+        RNShake.removeEventListener('ShakeEvent');
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, [rollOnce]),
+  );
+
+  const onEndReached = () => {
+    Vibration.vibrate(100);
+    setRolledItems([]);
+  };
+
+  const showEditor = useCallback(() => {
     setEditorVisible(true);
-  };
-  const hideEditor = () => {
+  }, []);
+
+  const hideEditor = useCallback(() => {
     setEditorVisible(false);
-  };
+  }, []);
+
+  const onSave = useCallback(
+    (list: ListType) => {
+      dispatch(listEditAction(list));
+    },
+    [dispatch],
+  );
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <Header
         title={list?.id ? list.title : 'List randomizer'}
-        right={<IconButton icon="edit" onPress={showEditor} />}
+        right={<IconButton name="edit" onPress={showEditor} />}
       />
       <FlatList
         data={list?.items || []}
@@ -131,8 +136,7 @@ const ListRandomizer = () => {
             : '#f0f7ff';
 
           return (
-            <View
-              style={[styles.listItem, { backgroundColor, shadowColor: themeColors.shadowColor }]}>
+            <View style={[styles.listItem, { backgroundColor, shadowColor: shadowColor }]}>
               <Text size={18}>{item}</Text>
             </View>
           );
@@ -140,11 +144,7 @@ const ListRandomizer = () => {
       />
 
       {visible && (
-        <View
-          style={[
-            styles.overlay,
-            { backgroundColor: isDarkMode ? 'rgba(1, 12, 20,0.9)' : 'rgba(247, 249, 240,0.9)' },
-          ]}>
+        <View style={[styles.overlay, isDarkMode && styles.darkStyleOverlay]}>
           <Pad
             loading={waiting}
             height={numPadH}
@@ -159,10 +159,7 @@ const ListRandomizer = () => {
       <View pointerEvents="box-none" style={styles.footer}>
         <View
           pointerEvents="none"
-          style={[
-            styles.footerOverlay,
-            { backgroundColor: isDarkMode ? 'rgba(1, 12, 20,0.7)' : 'rgba(247, 249, 240,0.7)' },
-          ]}
+          style={[styles.footerOverlay, isDarkMode && styles.darkStyleFooteOverlay]}
         />
         <StartButton
           text={rolledItems.length === list?.items.length ? 'Reset' : 'Start'}
@@ -174,7 +171,7 @@ const ListRandomizer = () => {
         visible={editorVisible}
         defaultListName={list?.title}
         onClose={hideEditor}
-        onSave={save}
+        onSave={onSave}
       />
     </View>
   );
@@ -201,6 +198,10 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     paddingTop: s(120),
+    backgroundColor: 'rgba(247, 249, 240,0.9)',
+  },
+  darkStyleOverlay: {
+    backgroundColor: 'rgba(1, 12, 20,0.9)',
   },
 
   footer: {
@@ -213,9 +214,12 @@ const styles = StyleSheet.create({
   },
   footerOverlay: {
     ...StyleSheet.absoluteFillObject,
-
+    backgroundColor: 'rgba(247, 249, 240,0.7)',
     width: '100%',
     borderTopRightRadius: wWidth * 0.5,
     borderTopLeftRadius: wWidth * 0.5,
+  },
+  darkStyleFooteOverlay: {
+    backgroundColor: 'rgba(1, 12, 20,0.7)',
   },
 });

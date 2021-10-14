@@ -41,7 +41,7 @@ module.exports = {
     // React-Hooks Plugin
     // The following rules are made available via `eslint-plugin-react-hooks`
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-hooks/exhaustive-deps": "off", // Checks effect dependencies
+    // "react-hooks/exhaustive-deps": "off", // Checks effect dependencies
 
     // React-Native Plugin
     // The following rules are made available via `eslint-plugin-react-native`

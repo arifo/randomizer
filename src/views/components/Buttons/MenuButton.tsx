@@ -2,6 +2,7 @@ import React from 'react';
 
 import { StyleSheet, Dimensions, View } from 'react-native';
 
+import { RootStackParamList } from 'navigation/list';
 import { s } from 'utils/scaler';
 import { useAppTheme } from 'views/contexts/useAppTheme';
 
@@ -9,10 +10,12 @@ import { Text } from '../Text';
 
 import { ButtonBase } from './Base';
 
+type RouteProp = keyof RootStackParamList;
+
 interface MenuButtonProps {
   title: string;
-  route: string;
-  onPress: (route: string) => void;
+  route: RouteProp;
+  onPress: (route: RouteProp) => void;
 }
 
 const { width } = Dimensions.get('window');

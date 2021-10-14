@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { View, StyleSheet, TextInput, Switch } from 'react-native';
-import { useSelector } from 'react-redux';
+import { View, StyleSheet } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { useAction } from 'hooks/useAction';
 import {
   setAutoGenerate,
   setDelay,
@@ -16,64 +15,10 @@ import {
   // setDefaultSettings,
 } from 'modules/numberSettings/actions';
 import { RootState } from 'types';
-import { s } from 'utils/scaler';
-import { isNumber } from 'utils/strings';
 import { FullscreenModal } from 'views/components/FullscreenModal';
-import { SettingsItem } from 'views/components/SettingsItem';
-import { useAppTheme } from 'views/contexts/useAppTheme';
 
-type InputSettingProps = {
-  label: string;
-  value: string | number;
-  onBlur?: () => void;
-  onSubmitEditing?: () => void;
-  onChange: (value: number) => void;
-};
-
-const SettingInput = ({ label, value, onBlur, onSubmitEditing, onChange }: InputSettingProps) => {
-  const { isDarkMode } = useAppTheme();
-  const handleInput = (t: string) => {
-    if (!t) {
-      onChange(t);
-      return;
-    }
-    if (isNumber(t)) {
-      onChange(Number(t));
-    }
-  };
-
-  const color = isDarkMode ? 'white' : 'black';
-
-  return (
-    <SettingsItem label={label}>
-      <TextInput
-        value={`${value}`}
-        onChangeText={handleInput}
-        numberOfLines={1}
-        maxLength={7}
-        keyboardType={'number-pad'}
-        returnKeyLabel="Done"
-        returnKeyType="done"
-        onBlur={onBlur}
-        onSubmitEditing={onSubmitEditing}
-        style={[styles.input, { color }]}
-      />
-    </SettingsItem>
-  );
-};
-
-type SwitchSettingProps = {
-  label: string;
-  value: boolean;
-  onChange: (value: boolean) => void;
-};
-export const SettingSwitch = ({ label, value, onChange }: SwitchSettingProps) => {
-  return (
-    <SettingsItem label={label}>
-      <Switch value={value} onValueChange={onChange} />
-    </SettingsItem>
-  );
-};
+import { SettingInput } from './Input';
+import { SettingsSwitch } from './Switch';
 
 interface SettingsProps {
   visible: boolean;
@@ -81,15 +26,7 @@ interface SettingsProps {
 }
 
 export const NumberSettings = ({ visible, onClose }: SettingsProps) => {
-  const setMin = useAction(setMinNumber);
-  const setMax = useAction(setMaxNumber);
-  const setCount = useAction(setNumbersCount);
-  const setAuto = useAction(setAutoGenerate);
-  const setNumDelay = useAction(setDelay);
-  const setUnique = useAction(setUniqueOnly);
-  const setPressStart = useAction(setPressToStart);
-  const setShakeStart = useAction(setShakeToStart);
-  // const restoreDefault = useAction(setDefaultSettings);
+  const dispatch = useDispatch();
 
   const {
     minNum,
@@ -101,6 +38,62 @@ export const NumberSettings = ({ visible, onClose }: SettingsProps) => {
     pressToStart,
     shakeToStart,
   } = useSelector((state: RootState) => state.numberSettings);
+
+  const setMin = useCallback(
+    (num: number) => {
+      dispatch(setMinNumber(num));
+    },
+    [dispatch],
+  );
+
+  const setMax = useCallback(
+    (num: number) => {
+      dispatch(setMaxNumber(num));
+    },
+    [dispatch],
+  );
+
+  const setCount = useCallback(
+    (num: number) => {
+      dispatch(setNumbersCount(num));
+    },
+    [dispatch],
+  );
+
+  const setAuto = useCallback(
+    (val: boolean) => {
+      dispatch(setAutoGenerate(val));
+    },
+    [dispatch],
+  );
+
+  const setUnique = useCallback(
+    (val: boolean) => {
+      dispatch(setUniqueOnly(val));
+    },
+    [dispatch],
+  );
+
+  const setNumDelay = useCallback(
+    (num: number) => {
+      dispatch(setDelay(num));
+    },
+    [dispatch],
+  );
+
+  const setPressStart = useCallback(
+    (val: boolean) => {
+      dispatch(setPressToStart(val));
+    },
+    [dispatch],
+  );
+
+  const setShakeStart = useCallback(
+    (val: boolean) => {
+      dispatch(setShakeToStart(val));
+    },
+    [dispatch],
+  );
 
   const handleClose = () => {
     if (!minNum) {
@@ -174,10 +167,10 @@ export const NumberSettings = ({ visible, onClose }: SettingsProps) => {
           setNumDelay(Math.max(Math.min(delay, 10), 1));
         }}
       />
-      <SettingSwitch label="Auto generate" value={autoGenerate} onChange={setAuto} />
-      <SettingSwitch label="Unique numbers" value={uniqueOnly} onChange={setUnique} />
-      <SettingSwitch label="Press to start" value={pressToStart} onChange={setPressStart} />
-      <SettingSwitch label="Shake to start" value={shakeToStart} onChange={setShakeStart} />
+      <SettingsSwitch label="Auto generate" value={autoGenerate} onChange={setAuto} />
+      <SettingsSwitch label="Unique numbers" value={uniqueOnly} onChange={setUnique} />
+      <SettingsSwitch label="Press to start" value={pressToStart} onChange={setPressStart} />
+      <SettingsSwitch label="Shake to start" value={shakeToStart} onChange={setShakeStart} />
 
       {/* <ButtonBase
         onPress={restoreDefault}
@@ -191,12 +184,5 @@ export const NumberSettings = ({ visible, onClose }: SettingsProps) => {
 };
 
 const styles = StyleSheet.create({
-  input: {
-    fontSize: s(17),
-    textAlign: 'center',
-    flex: 1,
-    width: '100%',
-  },
-
   spacer: { height: 25 },
 });

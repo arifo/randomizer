@@ -1,63 +1,66 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { useNavigation } from '@react-navigation/native';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import DraggableFlatList from 'react-native-draggable-flatlist';
+import DraggableFlatList, { DragEndParams } from 'react-native-draggable-flatlist';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { useSelector } from 'react-redux';
-
-import { Alert } from '@components/Alerts';
-import { IconButton, FloatingButton } from '@components/Buttons';
-import Header from '@components/Header';
-import { ListEditor } from '@components/ListEditor';
-import { Text } from '@components/Text';
-import { useAction } from 'hooks/useAction';
 import { listAddAction, listDeleteAction, listSortAction } from 'modules/lists/actions';
 import { ListType } from 'modules/lists/types';
-
+import { RootStackComponent } from 'navigation/list';
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
+import { Alert } from 'views/components/Alerts';
+import { IconButton, FloatingButton } from 'views/components/Buttons';
+import Header from 'views/components/Header';
+import { ListEditor } from 'views/components/ListEditor';
+import { Text } from 'views/components/Text';
 import { useAppTheme } from 'views/contexts/useAppTheme';
 
-const ListsScreen = () => {
-  const save = useAction(listAddAction);
-  const deleteList = useAction(listDeleteAction);
-
-  const navigation = useNavigation();
-
-  const { isDarkMode, themeColors } = useAppTheme();
-
-  const backgroundColor = themeColors.backgroundColor;
-
-  const sortList = useAction(listSortAction);
-
+const ListsScreen: RootStackComponent<'ListsScreen'> = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const {
+    isDarkMode,
+    themeColors: { backgroundColor, shadowColor },
+  } = useAppTheme();
   const { lists } = useSelector((state: RootState) => state.lists);
 
   const [modal, showModal] = useState(false);
   const [listToDelete, setListToDelete] = useState<ListType>();
 
-  const showNewList = () => {
+  const showNewList = useCallback(() => {
     showModal(true);
-  };
-  const hideNewList = () => {
+  }, []);
+  const hideNewList = useCallback(() => {
     showModal(false);
-  };
+  }, []);
 
-  const showDeleteAlert = (item: ListType) => {
+  const showDeleteAlert = useCallback((item: ListType) => {
     setListToDelete(item);
-  };
-  const hideDeleteAlert = () => {
+  }, []);
+  const hideDeleteAlert = useCallback(() => {
     setListToDelete(undefined);
-  };
+  }, []);
 
-  const handleDelete = () => {
+  const onDragEnd = useCallback(
+    ({ data }: DragEndParams<ListType>) => {
+      dispatch(listSortAction(data));
+    },
+    [dispatch],
+  );
+
+  const handleDelete = useCallback(() => {
     if (listToDelete) {
-      deleteList(listToDelete?.id);
+      dispatch(listDeleteAction(listToDelete.id));
     }
     setListToDelete(undefined);
-  };
+  }, [listToDelete, dispatch]);
 
-  const borderColor = isDarkMode ? '#343a40' : '#ced4da';
+  const onSave = useCallback(
+    (list: ListType) => {
+      dispatch(listAddAction(list));
+    },
+    [dispatch],
+  );
 
   const renderEmptyList = () => (
     <View style={styles.emptyList}>
@@ -71,34 +74,32 @@ const ListsScreen = () => {
     </View>
   );
 
+  const borderColor = isDarkMode ? '#343a40' : '#ced4da';
+  const listItemStyles = [
+    styles.card,
+    {
+      borderColor,
+      shadowColor: shadowColor,
+      backgroundColor: isDarkMode ? '#212529' : '#dee2e6',
+    },
+  ];
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <Header title="Lists" />
       <DraggableFlatList
         data={lists}
-        onDragEnd={({ data }) => sortList(data)}
+        onDragEnd={onDragEnd}
         keyExtractor={i => i.id}
-        contentContainerStyle={[
-          { paddingVertical: s(20), paddingHorizontal: s(15) },
-          !lists.length && { flex: 1 },
-        ]}
+        contentContainerStyle={[styles.listPadding, !lists.length && styles.flex]}
         ListEmptyComponent={renderEmptyList}
         ItemSeparatorComponent={() => <View style={{ height: s(20) }} />}
-        renderItem={({ item, index, drag, isActive }) => {
+        renderItem={({ item, drag }) => {
           return (
             <TouchableOpacity
               onLongPress={drag}
               onPress={() => navigation.navigate('ListRandomizer', { id: item.id })}>
-              <View
-                style={[
-                  styles.card,
-                  // eslint-disable-next-line react-native/no-inline-styles
-                  {
-                    borderColor,
-                    shadowColor: themeColors.shadowColor,
-                    backgroundColor: isDarkMode ? '#212529' : '#dee2e6',
-                  },
-                ]}>
+              <View style={listItemStyles}>
                 <View style={styles.cardTop}>
                   <Text numberOfLines={3} size={15} style={styles.cardTitle}>
                     {item.title}
@@ -106,7 +107,7 @@ const ListsScreen = () => {
 
                   <View style={styles.cardAction}>
                     <IconButton
-                      icon="delete"
+                      name="delete"
                       onPress={() => showDeleteAlert(item)}
                       style={styles.deleteButton}
                     />
@@ -134,7 +135,7 @@ const ListsScreen = () => {
       <ListEditor
         visible={modal}
         onClose={hideNewList}
-        onSave={save}
+        onSave={onSave}
         defaultListName={`List ${lists.length + 1}`}
       />
     </View>
@@ -147,6 +148,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  listPadding: { paddingVertical: s(20), paddingHorizontal: s(15) },
   card: {
     padding: 15,
     backgroundColor: 'grey',
@@ -174,4 +176,6 @@ const styles = StyleSheet.create({
   emptyList: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 150 },
   emptyTitle: { textAlign: 'center', marginBottom: 5 },
   emptyMessage: { textAlign: 'center', marginBottom: 25 },
+
+  flex: { flex: 1 },
 });

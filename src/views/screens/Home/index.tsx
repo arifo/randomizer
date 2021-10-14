@@ -1,19 +1,24 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { useNavigation } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 
-import { Container } from '@components/Container';
+import { RootStackComponent, RootStackParamList } from 'navigation/list';
 import { s } from 'utils/scaler';
 import { IconButton, MenuButton } from 'views/components/Buttons';
+import { Container } from 'views/components/Container';
 import Header from 'views/components/Header';
 
-const HomeScreen = () => {
-  const navigation = useNavigation();
+const HomeScreen: RootStackComponent<'Home'> = ({ navigation }) => {
+  const navToRoute = useCallback(
+    (route: keyof RootStackParamList) => {
+      navigation.navigate(route);
+    },
+    [navigation],
+  );
 
-  const navToRoute = (route: string) => {
-    navigation.navigate(route);
-  };
+  const navToSettings = useCallback(() => {
+    navigation.navigate('SettingsScreen');
+  }, [navigation]);
 
   return (
     <Container
@@ -23,7 +28,7 @@ const HomeScreen = () => {
           withSafeArea={false}
           withBack={false}
           title="Random"
-          right={<IconButton icon="settings" onPress={() => navToRoute('SettingsScreen')} />}
+          right={<IconButton name="settings" onPress={navToSettings} />}
         />
       }>
       <View style={styles.flexRow}>

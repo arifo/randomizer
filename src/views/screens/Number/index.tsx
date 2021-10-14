@@ -3,23 +3,20 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, StyleSheet, Dimensions, UIManager, Vibration } from 'react-native';
 import RNShake from 'react-native-shake';
-// import Toast from 'react-native-toast-message';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { IconButton, StartButton } from '@components/Buttons';
-import { Container } from '@components/Container';
-import Header from '@components/Header';
-import { Pad } from '@components/Pad';
-import { RolledItems } from '@components/RolledItems';
-import { Text } from '@components/Text';
-import { useAction } from 'hooks/useAction';
 import { useDebounceCallback } from 'hooks/useDebounce';
 import { saveNumberHistory } from 'modules/history/actions';
-
 import { getRandomNum } from 'randomizer';
 import { RootState } from 'types';
 import { isAndroid } from 'utils/platforms';
 import { s } from 'utils/scaler';
+import { IconButton, StartButton } from 'views/components/Buttons';
+import { Container } from 'views/components/Container';
+import Header from 'views/components/Header';
+import { Pad } from 'views/components/Pad';
+import { RolledItems } from 'views/components/RolledItems';
+import { Text } from 'views/components/Text';
 
 import { NumberSettings } from './Settings';
 
@@ -30,14 +27,12 @@ if (isAndroid) {
 }
 
 const { width } = Dimensions.get('window');
-
 const numPadH = width * 0.7;
 
 const NumberScreen = () => {
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const timerRef = useRef<NodeJS.Timeout>();
-
-  const saveToHistory = useAction(saveNumberHistory);
+  const timerRef = useRef<NodeJS.Timer>();
+  const dispatch = useDispatch();
 
   const {
     minNum,
@@ -56,17 +51,112 @@ const NumberScreen = () => {
 
   const hasEnded = (uniqueOnly ? Math.min(count, maxNum - minNum + 1) : count) <= randomNums.length;
 
-  const clearTimers = () => {
+  const clearTimers = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      clearTimers();
+    };
+  }, [clearTimers]);
+
+  const onEndReached = useCallback(() => {
+    Vibration.vibrate(100);
+
+    const history = {
+      count,
+      randomNumbers: randomNums,
+      min: minNum,
+      max: maxNum,
+      date: new Date(),
+    };
+    dispatch(saveNumberHistory(history));
+    setRandomNum([]);
+    clearTimers();
+  }, [clearTimers, count, dispatch, maxNum, minNum, randomNums]);
+
+  const generateNumber = useCallback(
+    (numbers: number[]) => {
+      let num = getRandomNum(minNum, maxNum);
+      if (uniqueOnly && numbers.includes(num)) {
+        while (numbers.includes(num)) {
+          num = getRandomNum(minNum, maxNum);
+        }
+      }
+      return num;
+    },
+    [maxNum, minNum, uniqueOnly],
+  );
+
+  const setNumbers = useCallback(() => {
+    setRandomNum(prevState => {
+      const nextNumber = generateNumber(prevState);
+      return [...prevState, nextNumber];
+    });
+
+    Vibration.vibrate(50);
+    setWaiting(false);
+  }, [generateNumber]);
+
+  const rollOnce = useDebounceCallback(
+    useCallback(() => {
+      if (waiting) {
+        return;
+      }
+
+      if (hasEnded) {
+        onEndReached();
+        return;
+      }
+
+      setWaiting(true);
+      timeoutRef.current = setTimeout(setNumbers, delay * 1000);
+    }, [waiting, hasEnded, setNumbers, delay, onEndReached]),
+    100,
+  );
+
+  const autoRoll = useDebounceCallback(
+    useCallback(() => {
+      if (waiting) {
+        return;
+      }
+
+      if (hasEnded) {
+        onEndReached();
+        return;
+      }
+
+      setWaiting(true);
+      timerRef.current = setInterval(setNumbers, delay * 1000);
+    }, [waiting, hasEnded, setNumbers, delay, onEndReached]),
+    100,
+  );
+
+  const handleStop = useCallback(() => {
+    clearTimers();
+    setWaiting(false);
+  }, [clearTimers]);
+
+  const handleStart = useCallback(() => {
+    if (waiting) {
+      handleStop();
+      return;
+    }
+    if (autoGenerate) {
+      autoRoll();
+    } else {
+      rollOnce();
+    }
+  }, [waiting, autoGenerate, handleStop, autoRoll, rollOnce]);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       RNShake.addEventListener('ShakeEvent', () => {
         if (shakeToStart) {
           handleStart();
@@ -74,9 +164,8 @@ const NumberScreen = () => {
       });
       return () => {
         RNShake.removeEventListener('ShakeEvent');
-        clearTimers();
       };
-    }, []),
+    }, [shakeToStart, handleStart]),
   );
 
   useEffect(() => {
@@ -88,104 +177,6 @@ const NumberScreen = () => {
       return;
     }
   }, [hasEnded]);
-
-  const handleStop = () => {
-    clearTimers();
-
-    setWaiting(false);
-  };
-
-  const onEndReached = () => {
-    Vibration.vibrate(100);
-    // Toast.show({
-    //   text1: 'Saved to history',
-    //   type: 'success',
-    //   visibilityTime: 1000,
-    //   topOffset: 50,
-    // });
-    saveToHistory({
-      count,
-      randomNumbers: randomNums,
-      min: minNum,
-      max: maxNum,
-      date: new Date(),
-    });
-    setRandomNum([]);
-    clearTimers();
-  };
-
-  const generateNumber = (numbers: number[]) => {
-    let num = getRandomNum(minNum, maxNum);
-    if (uniqueOnly && numbers.includes(num)) {
-      while (numbers.includes(num)) {
-        num = getRandomNum(minNum, maxNum);
-      }
-    }
-    return num;
-  };
-
-  const rollOnce = useDebounceCallback(
-    useCallback(() => {
-      if (waiting) {
-        return;
-      }
-
-      // Toast.hide();
-
-      if (hasEnded) {
-        onEndReached();
-        return;
-      }
-
-      setWaiting(true);
-      timeoutRef.current = setTimeout(() => {
-        setRandomNum(prevState => {
-          const nextNumber = generateNumber(prevState);
-          return [...prevState, nextNumber];
-        });
-        Vibration.vibrate(50);
-        setWaiting(false);
-      }, delay * 1000);
-    }, [waiting, count, minNum, maxNum, randomNums, delay]),
-    100,
-  );
-
-  const autoRoll = useDebounceCallback(
-    useCallback(() => {
-      if (waiting) {
-        return;
-      }
-
-      // Toast.hide();
-
-      if (hasEnded) {
-        onEndReached();
-        return;
-      }
-      setWaiting(true);
-
-      timerRef.current = setInterval(() => {
-        setRandomNum(prevState => {
-          const nextNumber = generateNumber(prevState);
-          return [...prevState, nextNumber];
-        });
-        Vibration.vibrate(50);
-      }, delay * 1000);
-    }, [waiting, count, minNum, maxNum, randomNums, delay]),
-    100,
-  );
-
-  const handleStart = () => {
-    if (waiting) {
-      handleStop();
-      return;
-    }
-    if (autoGenerate) {
-      autoRoll();
-    } else {
-      rollOnce();
-    }
-  };
 
   const getHintText = (btnTxt: string = 'Start') => {
     if (pressToStart && shakeToStart) {
@@ -224,7 +215,6 @@ const NumberScreen = () => {
   };
 
   const buttonText = getButtonText();
-  // randomNums.length > 0 ? (count <= randomNums.length ? 'Reset' : 'Next') : 'Start';
 
   return (
     <>
@@ -234,7 +224,7 @@ const NumberScreen = () => {
           <Header
             withSafeArea={false}
             title="Number Generator"
-            right={<IconButton icon="settings" onPress={openSettings} />}
+            right={<IconButton name="settings" onPress={openSettings} />}
           />
         }>
         <Pad

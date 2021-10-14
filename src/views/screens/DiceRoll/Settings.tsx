@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import Slider from '@react-native-community/slider';
 import { View, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { FullscreenModal } from '@components/FullscreenModal';
-import { Text } from '@components/Text';
-import { useAction } from 'hooks/useAction';
 import { setDiceCount, setPressToStart, setShakeToStart } from 'modules/diceSettings/actions';
 import { RootState } from 'types';
 import { s } from 'utils/scaler';
+import { FullscreenModal } from 'views/components/FullscreenModal';
+import { Text } from 'views/components/Text';
 import { useAppTheme } from 'views/contexts/useAppTheme';
 
-import { SettingSwitch } from '../Number/Settings';
+import { SettingsSwitch } from '../Number/Settings/Switch';
 
 interface SettingsProps {
   visible: boolean;
@@ -21,9 +20,7 @@ interface SettingsProps {
 
 export const DiceSettings = ({ visible, onClose }: SettingsProps) => {
   const { isDarkMode } = useAppTheme();
-  const setCountAction = useAction(setDiceCount);
-  const setPressStart = useAction(setPressToStart);
-  const setShakeStart = useAction(setShakeToStart);
+  const dispatch = useDispatch();
 
   const { diceCount, pressToStart, shakeToStart } = useSelector(
     (state: RootState) => state.diceSettings,
@@ -35,14 +32,28 @@ export const DiceSettings = ({ visible, onClose }: SettingsProps) => {
     if (visible) {
       setCount(diceCount);
     }
-  }, [visible]);
+  }, [diceCount, visible]);
 
   const borderColor = isDarkMode ? '#343a40' : '#ced4da';
 
   const onCountChange = (val: number) => {
     setCount(val);
-    setCountAction(val);
+    dispatch(setDiceCount(val));
   };
+
+  const setStartButton = useCallback(
+    (value: boolean) => {
+      dispatch(setPressToStart(value));
+    },
+    [dispatch],
+  );
+
+  const setShakeStart = useCallback(
+    (value: boolean) => {
+      dispatch(setShakeToStart(value));
+    },
+    [dispatch],
+  );
 
   return (
     <FullscreenModal visible={visible} onClose={onClose} title="Dice settings">
@@ -68,8 +79,8 @@ export const DiceSettings = ({ visible, onClose }: SettingsProps) => {
           <Text size={14}>6</Text>
         </View>
       </View>
-      <SettingSwitch label="Press to start" value={pressToStart} onChange={setPressStart} />
-      <SettingSwitch label="Shake to start" value={shakeToStart} onChange={setShakeStart} />
+      <SettingsSwitch label="Roll Button" value={pressToStart} onChange={setStartButton} />
+      <SettingsSwitch label="Shake" value={shakeToStart} onChange={setShakeStart} />
     </FullscreenModal>
   );
 };

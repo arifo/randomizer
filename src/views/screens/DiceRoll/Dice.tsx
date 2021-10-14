@@ -30,9 +30,12 @@ export const Dice = ({ value, color = '#8cd3ff', loading }: DiceProps) => {
         return <View style={[styles.face, { backgroundColor: color }]} />;
     }
   };
+
+  const opacity = loading ? 0.6 : 1;
+
   return (
-    <View style={[styles.container, { opacity: loading ? 0.6 : 1 }]}>
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: color, opacity: 0.91 }} />
+    <View style={[styles.container, { opacity, backgroundColor: color }]}>
+      <View style={styles.background} />
       {renderDice()}
     </View>
   );
@@ -108,6 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
   },
+  background: { ...StyleSheet.absoluteFillObject, backgroundColor: 'grey', opacity: 0.91 },
   face: {
     padding: SIZE * 0.03,
     borderRadius: SIZE * 0.15,

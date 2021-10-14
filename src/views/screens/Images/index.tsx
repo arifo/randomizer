@@ -6,9 +6,10 @@ import Header from 'views/components/Header';
 import { useAppTheme } from 'views/contexts/useAppTheme';
 
 const ImageRandomizer = () => {
-  const { themeColors } = useAppTheme();
+  const {
+    themeColors: { backgroundColor },
+  } = useAppTheme();
 
-  const backgroundColor = themeColors.backgroundColor;
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <Header title="ImageRandomizer" />

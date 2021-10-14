@@ -64,7 +64,7 @@ const Header = ({
       <View style={[styles.container, style]}>
         <View style={[styles.left, sideViewStyles]}>
           {withBack && !left ? (
-            <IconButton hitSlop={hitSlop} icon="chevron-left" onPress={handleBackPress} />
+            <IconButton hitSlop={hitSlop} name="chevronLeft" onPress={handleBackPress} />
           ) : (
             left
           )}

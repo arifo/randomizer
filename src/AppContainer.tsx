@@ -9,12 +9,17 @@ import AppNavigator from 'navigation';
 import { useAppTheme } from 'views/contexts/useAppTheme';
 
 function AppContainer() {
-  const { themeColors, isDarkMode } = useAppTheme();
+  const {
+    isDarkMode,
+    themeColors: { backgroundColor },
+  } = useAppTheme();
   useEffect(() => {
     RNBootSplash.hide();
   }, []);
+
   return (
-    <View style={{ backgroundColor: themeColors.backgroundColor, flex: 1 }}>
+    // eslint-disable-next-line react-native/no-inline-styles
+    <View style={{ flex: 1, backgroundColor }}>
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <StatusBar
           translucent
